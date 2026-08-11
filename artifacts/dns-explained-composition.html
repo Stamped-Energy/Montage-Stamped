@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap");
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #050810;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: #e8f4ff;
+      }
+
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background:
+          radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 212, 255, 0.08), transparent 60%),
+          radial-gradient(ellipse 50% 40% at 80% 100%, rgba(255, 107, 53, 0.06), transparent 50%),
+          #050810;
+      }
+
+      .grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+        background-size: 60px 60px;
+        opacity: 0.6;
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .label-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 14px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #00d4ff;
+        margin-bottom: 16px;
+      }
+
+      .headline {
+        font-size: 72px;
+        font-weight: 700;
+        line-height: 1.1;
+        text-align: center;
+        max-width: 1400px;
+      }
+
+      .headline .accent { color: #00d4ff; }
+      .headline .warm { color: #ff6b35; }
+
+      .sub {
+        font-size: 28px;
+        color: rgba(232, 244, 255, 0.65);
+        margin-top: 20px;
+        text-align: center;
+        max-width: 900px;
+      }
+
+      /* URL bar scene */
+      .url-bar-wrap {
+        width: 1100px;
+        padding: 6px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(255, 107, 53, 0.2));
+      }
+
+      .url-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: #0d1520;
+        border-radius: 12px;
+        padding: 24px 32px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 36px;
+      }
+
+      .url-bar .lock { color: #4ade80; font-size: 28px; }
+      .url-bar .typed { color: #fff; }
+      .url-bar .cursor {
+        display: inline-block;
+        width: 3px;
+        height: 40px;
+        background: #00d4ff;
+        margin-left: 2px;
+        vertical-align: middle;
+      }
+
+      /* Network diagram */
+      .diagram {
+        width: 1600px;
+        height: 700px;
+        position: relative;
+      }
+
+      .node {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .node-box {
+        width: 200px;
+        height: 120px;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 2px solid rgba(0, 212, 255, 0.4);
+        background: rgba(13, 21, 32, 0.9);
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
+      }
+
+      .node-box.active {
+        border-color: #00d4ff;
+        box-shadow: 0 0 50px rgba(0, 212, 255, 0.4);
+        background: rgba(0, 212, 255, 0.1);
+      }
+
+      .node-box.warm {
+        border-color: rgba(255, 107, 53, 0.5);
+      }
+
+      .node-box.warm.active {
+        border-color: #ff6b35;
+        box-shadow: 0 0 50px rgba(255, 107, 53, 0.4);
+        background: rgba(255, 107, 53, 0.1);
+      }
+
+      .node-icon { font-size: 36px; }
+      .node-name {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+        color: #fff;
+      }
+
+      .node-role {
+        font-size: 13px;
+        color: rgba(232, 244, 255, 0.5);
+        text-align: center;
+        max-width: 180px;
+      }
+
+      .node-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        color: #00d4ff;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      /* Node positions */
+      #node-browser { left: 80px; top: 280px; }
+      #node-resolver { left: 420px; top: 280px; }
+      #node-root { left: 760px; top: 80px; }
+      #node-tld { left: 760px; top: 280px; }
+      #node-auth { left: 760px; top: 480px; }
+      #node-ip { left: 1180px; top: 280px; }
+
+      .packet {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #00d4ff;
+        box-shadow: 0 0 20px #00d4ff, 0 0 40px rgba(0, 212, 255, 0.5);
+        z-index: 10;
+      }
+
+      .packet.return {
+        background: #ff6b35;
+        box-shadow: 0 0 20px #ff6b35, 0 0 40px rgba(255, 107, 53, 0.5);
+      }
+
+      svg.connections {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .conn-line {
+        fill: none;
+        stroke: rgba(0, 212, 255, 0.25);
+        stroke-width: 2;
+        stroke-dasharray: 8 6;
+      }
+
+      .conn-line.lit {
+        stroke: #00d4ff;
+        stroke-width: 3;
+        filter: drop-shadow(0 0 6px #00d4ff);
+      }
+
+      /* Hierarchy visual */
+      .hierarchy {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        width: 900px;
+      }
+
+      .hier-level {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        width: 100%;
+        padding: 20px 0;
+        border-left: 3px solid transparent;
+        padding-left: 32px;
+        transition: border-color 0.3s;
+      }
+
+      .hier-level.active {
+        border-left-color: #00d4ff;
+        background: linear-gradient(90deg, rgba(0, 212, 255, 0.08), transparent);
+      }
+
+      .hier-num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 48px;
+        font-weight: 700;
+        color: rgba(0, 212, 255, 0.3);
+        width: 60px;
+      }
+
+      .hier-level.active .hier-num { color: #00d4ff; }
+
+      .hier-content h3 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .hier-content p {
+        font-size: 20px;
+        color: rgba(232, 244, 255, 0.55);
+      }
+
+      /* IP reveal */
+      .ip-display {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 96px;
+        font-weight: 700;
+        color: #ff6b35;
+        text-shadow: 0 0 60px rgba(255, 107, 53, 0.5);
+        letter-spacing: 0.05em;
+      }
+
+      .ip-label {
+        font-size: 24px;
+        color: rgba(232, 244, 255, 0.5);
+        margin-top: 16px;
+      }
+
+      /* Finale */
+      .finale-title {
+        font-size: 88px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00d4ff, #ff6b35);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .finale-sub {
+        font-size: 32px;
+        color: rgba(232, 244, 255, 0.6);
+        margin-top: 20px;
+      }
+
+      .step-indicator {
+        position: absolute;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+      }
+
+      .step-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(0, 212, 255, 0.2);
+      }
+
+      .step-dot.active { background: #00d4ff; box-shadow: 0 0 12px #00d4ff; }
+
+      .caption-bar {
+        position: absolute;
+        bottom: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(13, 21, 32, 0.85);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 16px 40px;
+        font-size: 26px;
+        max-width: 1200px;
+        text-align: center;
+        backdrop-filter: blur(8px);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="30"
+    >
+      <div class="grid-bg"></div>
+
+      <audio
+        id="narration"
+        src="assets/voice/narration.wav"
+        data-start="0"
+        data-volume="1"
+      ></audio>
+
+      <!-- Scene 1: Hook - URL bar -->
+      <section id="scene-hook" class="clip" data-start="0" data-duration="5" data-track-index="1">
+        <div class="label-tag">How the Internet Finds Websites</div>
+        <div class="url-bar-wrap" id="url-wrap">
+          <div class="url-bar">
+            <span class="lock">🔒</span>
+            <span class="typed" id="url-text"></span>
+            <span class="cursor" id="url-cursor"></span>
+          </div>
+        </div>
+        <p class="sub" id="hook-question" style="margin-top: 40px; opacity: 0;">
+          But how does a <span class="accent" style="color:#00d4ff">name</span> become a <span class="warm" style="color:#ff6b35">number</span>?
+        </p>
+      </section>
+
+      <!-- Scene 2: Browser → Resolver -->
+      <section id="scene-resolver" class="clip" data-start="5" data-duration="5.5" data-track-index="2">
+        <div class="label-tag">Step 1 — Recursive Resolver</div>
+        <div class="diagram" id="diagram-resolver">
+          <svg class="connections" viewBox="0 0 1600 700">
+            <path id="path-br" class="conn-line" d="M 180 340 L 520 340" />
+          </svg>
+          <div class="node" id="node-browser">
+            <div class="node-box active" id="box-browser">
+              <span class="node-icon">🌐</span>
+              <span class="node-name">Your Browser</span>
+            </div>
+            <span class="node-label">Client</span>
+          </div>
+          <div class="node" id="node-resolver">
+            <div class="node-box" id="box-resolver">
+              <span class="node-icon">🔄</span>
+              <span class="node-name">Recursive Resolver</span>
+            </div>
+            <span class="node-role">Your ISP's DNS server</span>
+          </div>
+          <div class="packet" id="packet1" style="left:180px;top:332px;opacity:0;"></div>
+        </div>
+        <div class="caption-bar" id="cap-resolver" style="opacity:0;">Checks cache first — if miss, starts the lookup chain</div>
+      </section>
+
+      <!-- Scene 3: DNS Hierarchy -->
+      <section id="scene-hierarchy" class="clip" data-start="10.5" data-duration="8" data-track-index="3">
+        <div class="label-tag">Step 2 — The DNS Hierarchy</div>
+        <div class="hierarchy">
+          <div class="hier-level" id="hier-root">
+            <span class="hier-num">.</span>
+            <div class="hier-content">
+              <h3>Root Server</h3>
+              <p>"Where is .com?" — points to TLD servers worldwide</p>
+            </div>
+          </div>
+          <div class="hier-level" id="hier-tld">
+            <span class="hier-num">.com</span>
+            <div class="hier-content">
+              <h3>TLD Server</h3>
+              <p>Top-Level Domain — "Where is google.com?"</p>
+            </div>
+          </div>
+          <div class="hier-level" id="hier-auth">
+            <span class="hier-num">@</span>
+            <div class="hier-content">
+              <h3>Authoritative Server</h3>
+              <p>Google's DNS — holds the real IP address</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 4: Full diagram with packet flow -->
+      <section id="scene-flow" class="clip" data-start="18.5" data-duration="5" data-track-index="4">
+        <div class="label-tag">The Full Lookup Chain</div>
+        <div class="diagram">
+          <svg class="connections" viewBox="0 0 1600 700">
+            <path id="path-b2r" class="conn-line" d="M 180 340 L 520 340" />
+            <path id="path-r2root" class="conn-line" d="M 620 340 L 860 140" />
+            <path id="path-r2tld" class="conn-line" d="M 620 340 L 860 340" />
+            <path id="path-r2auth" class="conn-line" d="M 620 340 L 860 540" />
+            <path id="path-auth2ip" class="conn-line" d="M 960 340 L 1280 340" />
+          </svg>
+          <div class="node" id="fn-browser" style="left:80px;top:280px;">
+            <div class="node-box"><span class="node-icon">🌐</span><span class="node-name">Browser</span></div>
+          </div>
+          <div class="node" id="fn-resolver" style="left:420px;top:280px;">
+            <div class="node-box active"><span class="node-icon">🔄</span><span class="node-name">Resolver</span></div>
+          </div>
+          <div class="node" style="left:760px;top:80px;">
+            <div class="node-box warm" id="fn-root"><span class="node-icon">🌍</span><span class="node-name">Root</span></div>
+          </div>
+          <div class="node" style="left:760px;top:280px;">
+            <div class="node-box warm" id="fn-tld"><span class="node-icon">📁</span><span class="node-name">.com TLD</span></div>
+          </div>
+          <div class="node" style="left:760px;top:480px;">
+            <div class="node-box warm" id="fn-auth"><span class="node-icon">🏢</span><span class="node-name">Authoritative</span></div>
+          </div>
+          <div class="node" id="fn-ip" style="left:1180px;top:280px;">
+            <div class="node-box" id="box-ip"><span class="node-icon">📍</span><span class="node-name" id="ip-text">142.250.80.46</span></div>
+          </div>
+          <div class="packet return" id="packet-return" style="left:1280px;top:332px;opacity:0;"></div>
+        </div>
+      </section>
+
+      <!-- Scene 5: IP Reveal -->
+      <section id="scene-ip" class="clip" data-start="23.5" data-duration="3" data-track-index="5">
+        <div class="ip-display" id="big-ip">142.250.80.46</div>
+        <div class="ip-label">IP Address returned → Browser connects</div>
+      </section>
+
+      <!-- Scene 6: Finale -->
+      <section id="scene-finale" class="clip" data-start="26.5" data-duration="3.5" data-track-index="6">
+        <div class="finale-title">DNS</div>
+        <div class="finale-sub">The Internet's Phone Book — resolved in milliseconds</div>
+        <div class="step-indicator">
+          <div class="step-dot active"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot active"></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 1: Type URL
+      const urlText = "google.com";
+      const urlEl = document.getElementById("url-text");
+      for (let i = 0; i <= urlText.length; i++) {
+        tl.call(() => { urlEl.textContent = urlText.slice(0, i); }, null, 0.3 + i * 0.12);
+      }
+      tl.to("#url-cursor", { opacity: 0, duration: 0.1, repeat: 5, yoyo: true, ease: "steps(1)" }, 0.3);
+      tl.from("#url-wrap", { scale: 0.9, opacity: 0, duration: 0.6, ease: "power3.out" }, 0);
+      tl.fromTo("#hook-question", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 2.2);
+
+      // Scene 2: Resolver (starts at 5s)
+      tl.from("#scene-resolver .label-tag", { opacity: 0, y: -20, duration: 0.5 }, 5);
+      tl.from("#box-browser", { scale: 0.8, opacity: 0, duration: 0.5, ease: "back.out(1.7)" }, 5.2);
+      tl.from("#box-resolver", { scale: 0.8, opacity: 0, duration: 0.5, ease: "back.out(1.7)" }, 5.5);
+      tl.to("#box-resolver", { className: "node-box active", duration: 0.3 }, 6);
+      tl.to("#path-br", { className: "conn-line lit", duration: 0.3 }, 6);
+      tl.to("#packet1", { opacity: 1, duration: 0.2 }, 6.2);
+      tl.to("#packet1", { x: 340, duration: 0.8, ease: "power2.inOut" }, 6.2);
+      tl.to("#cap-resolver", { opacity: 1, duration: 0.5 }, 7);
+
+      // Scene 3: Hierarchy (starts at 10.5s)
+      tl.from("#scene-hierarchy .label-tag", { opacity: 0, duration: 0.4 }, 10.5);
+      tl.from("#hier-root", { x: -40, opacity: 0, duration: 0.5, ease: "power2.out" }, 10.8);
+      tl.to("#hier-root", { className: "hier-level active", duration: 0.3 }, 11.5);
+      tl.from("#hier-tld", { x: -40, opacity: 0, duration: 0.5, ease: "power2.out" }, 12.5);
+      tl.to("#hier-root", { className: "hier-level", duration: 0.2 }, 12.5);
+      tl.to("#hier-tld", { className: "hier-level active", duration: 0.3 }, 13);
+      tl.from("#hier-auth", { x: -40, opacity: 0, duration: 0.5, ease: "power2.out" }, 14);
+      tl.to("#hier-tld", { className: "hier-level", duration: 0.2 }, 14);
+      tl.to("#hier-auth", { className: "hier-level active", duration: 0.3 }, 14.5);
+
+      // Scene 4: Full flow (starts at 18.5s)
+      tl.from("#scene-flow .label-tag", { opacity: 0, duration: 0.4 }, 18.5);
+      tl.from("#fn-browser, #fn-resolver, #fn-root, #fn-tld, #fn-auth, #fn-ip", { opacity: 0, scale: 0.85, duration: 0.4, stagger: 0.08, ease: "back.out(1.5)" }, 18.8);
+      const paths = ["#path-b2r", "#path-r2root", "#path-r2tld", "#path-r2auth", "#path-auth2ip"];
+      paths.forEach((p, i) => {
+        tl.to(p, { className: "conn-line lit", duration: 0.2 }, 19.5 + i * 0.4);
+      });
+      tl.to("#fn-root, #fn-tld, #fn-auth", { className: "node-box warm active", duration: 0.3, stagger: 0.3 }, 19.8);
+      tl.to("#box-ip", { className: "node-box active", duration: 0.3 }, 21.5);
+      tl.to("#packet-return", { opacity: 1, duration: 0.2 }, 21.2);
+      tl.to("#packet-return", { x: -1100, duration: 1.2, ease: "power2.inOut" }, 21.2);
+
+      // Scene 5: IP (starts at 23.5s)
+      tl.from("#big-ip", { scale: 0.5, opacity: 0, duration: 0.6, ease: "back.out(2)" }, 23.5);
+      tl.from(".ip-label", { opacity: 0, y: 20, duration: 0.5 }, 24);
+
+      // Scene 6: Finale (starts at 26.5s)
+      tl.from(".finale-title", { scale: 0.8, opacity: 0, duration: 0.7, ease: "power3.out" }, 26.5);
+      tl.from(".finale-sub", { opacity: 0, y: 30, duration: 0.6, ease: "power2.out" }, 27);
+      tl.from(".step-dot", { scale: 0, duration: 0.3, stagger: 0.1, ease: "back.out(2)" }, 27.3);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
