@@ -1,0 +1,1 @@
+You type google.com — but your computer doesn't speak websites. It speaks numbers. First, your browser asks a recursive resolver — usually your ISP's DNS server. No cache? The resolver chains through DNS: the root server points to the dot-com TLD, which points to Google's authoritative server, which returns the IP address. Your browser connects. DNS — the internet's phone book.
