@@ -50,6 +50,7 @@ required_skills:
 
 compatible_playbooks:
   recommended:
+    - stamped-industrial
     - flat-motion-graphics
   also_works:
     - clean-professional

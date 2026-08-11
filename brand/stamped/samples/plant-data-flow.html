@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stamped · Plant data flow (sample)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #000a07;
+      --ink: #e8f07a;
+      --ink-dim: rgba(232, 240, 122, 0.55);
+      --ink-soft: rgba(232, 240, 122, 0.22);
+      --coral: #F75440;
+      --panel-pad: 18px 22px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      overflow: hidden;
+    }
+
+    .stage {
+      position: relative;
+      width: min(1100px, 96vw);
+      height: min(720px, 96vh);
+      margin: 2vh auto;
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      gap: 0;
+    }
+
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 18px;
+      opacity: 0;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-lockup svg {
+      width: 28px;
+      height: 28px;
+      display: block;
+    }
+
+    .brand-name {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .brand-tag {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+
+    .diagram {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+    }
+
+    .diagram svg.wires {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .src {
+      position: absolute;
+      top: 8%;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .src--left { left: 8%; }
+    .src--mid { left: 50%; transform: translate(-50%, 10px); }
+    .src--right { right: 8%; }
+
+    .src-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .src-rule {
+      margin: 8px auto 0;
+      width: 100%;
+      max-width: 168px;
+      height: 6px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+      opacity: 0.9;
+    }
+
+    .hub {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      width: 72px;
+      height: 72px;
+      transform: translate(-50%, -50%) scale(0.9);
+      opacity: 0;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      border-radius: 10px;
+      box-shadow: 0 0 0 1px rgba(232, 240, 122, 0.15);
+    }
+
+    .hub svg {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* Force logo petals to draw in bg color on the lime chip */
+    .hub svg path { fill: var(--bg); }
+
+    .panel {
+      position: absolute;
+      bottom: 6%;
+      width: min(340px, 38%);
+      border: 1px solid var(--ink);
+      border-radius: 4px;
+      padding: var(--panel-pad);
+      opacity: 0;
+      transform: translateY(14px);
+      background: rgba(0, 10, 7, 0.35);
+      backdrop-filter: blur(2px);
+    }
+
+    .panel--left { left: 7%; }
+    .panel--right { right: 7%; }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .panel-rule {
+      height: 6px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+      margin-bottom: 10px;
+      opacity: 0.85;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--ink-soft);
+      font-size: 12px;
+      line-height: 1.35;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .row:last-child { border-bottom: none; }
+
+    .row .k { color: var(--ink); opacity: 0.92; }
+    .row .v {
+      color: var(--ink);
+      font-weight: 500;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .footnote {
+      margin-top: 14px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      text-align: center;
+      opacity: 0;
+    }
+
+    .wire {
+      fill: none;
+      stroke: var(--ink);
+      stroke-width: 1.25;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+    }
+
+    .packet {
+      fill: var(--ink);
+      opacity: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .brand-bar, .src, .hub, .panel, .row, .footnote, .wire {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      .packet { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <header class="brand-bar" id="brandBar">
+      <div class="brand-lockup">
+        <!-- Inline mark so the file opens alone -->
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <g fill="#F75440" transform="translate(60 60)">
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(60)"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(120)"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(180)"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(240)"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(300)"/>
+          </g>
+        </svg>
+        <div>
+          <div class="brand-name">Stamped Energy</div>
+          <div class="brand-tag">Plant-office decision layer</div>
+        </div>
+      </div>
+      <div class="brand-tag">Sample loop · indicative</div>
+    </header>
+
+    <div class="diagram" id="diagram">
+      <svg class="wires" id="wires" viewBox="0 0 1100 640" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <!-- Inbound: sources → hub -->
+        <path id="pathL" class="wire" d="M 160 90 L 160 220 Q 160 268 220 268 L 480 268 L 480 300" />
+        <path id="pathM" class="wire" d="M 550 90 L 550 300" />
+        <path id="pathR" class="wire" d="M 940 90 L 940 220 Q 940 268 880 268 L 620 268 L 620 300" />
+        <!-- Outbound: hub → panels -->
+        <path id="pathOutL" class="wire" d="M 550 360 L 550 400 Q 550 430 500 430 L 250 430 L 250 470" />
+        <path id="pathOutR" class="wire" d="M 550 360 L 550 400 Q 550 430 600 430 L 850 430 L 850 470" />
+
+        <!-- Packets (moved along paths) -->
+        <circle class="packet" r="3.5" data-path="pathL" data-phase="0" />
+        <circle class="packet" r="3.5" data-path="pathL" data-phase="0.45" />
+        <circle class="packet" r="3.5" data-path="pathM" data-phase="0.15" />
+        <circle class="packet" r="3.5" data-path="pathM" data-phase="0.6" />
+        <circle class="packet" r="3.5" data-path="pathR" data-phase="0.3" />
+        <circle class="packet" r="3.5" data-path="pathR" data-phase="0.75" />
+        <circle class="packet" r="3.5" data-path="pathOutL" data-phase="0.1" />
+        <circle class="packet" r="3.5" data-path="pathOutL" data-phase="0.55" />
+        <circle class="packet" r="3.5" data-path="pathOutR" data-phase="0.25" />
+        <circle class="packet" r="3.5" data-path="pathOutR" data-phase="0.7" />
+      </svg>
+
+      <div class="src src--left" data-spawn="src">
+        <div class="src-label">Plant telemetry</div>
+        <div class="src-rule"></div>
+      </div>
+      <div class="src src--mid" data-spawn="src">
+        <div class="src-label">Application data</div>
+        <div class="src-rule"></div>
+      </div>
+      <div class="src src--right" data-spawn="src">
+        <div class="src-label">External data</div>
+        <div class="src-rule"></div>
+      </div>
+
+      <div class="hub" id="hub" aria-label="Stamped Intelligence">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <g transform="translate(60 60)">
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(60)"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(120)"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(180)"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(240)"/>
+            <path d="M-20.5,-51 L20.5,-51 L11.5,-20 L0,-34 L-11.5,-20 Z" transform="rotate(300)"/>
+          </g>
+        </svg>
+      </div>
+
+      <section class="panel panel--left" data-spawn="panel">
+        <div class="panel-title">Plant status</div>
+        <div class="panel-rule"></div>
+        <div class="row"><span class="k">Incomer MD</span><span class="v">2,450 kVA</span></div>
+        <div class="row"><span class="k">Active load</span><span class="v">1,820 kW</span></div>
+        <div class="row"><span class="k">Idle HVAC</span><span class="v">180 kW</span></div>
+        <div class="row"><span class="k">Meter sync</span><span class="v">98%</span></div>
+      </section>
+
+      <section class="panel panel--right" data-spawn="panel">
+        <div class="panel-title">Rupee prescriptions</div>
+        <div class="panel-rule"></div>
+        <div class="row"><span class="k">Stagger compressors</span><span class="v">2.4 lakh rupee/mo</span></div>
+        <div class="row"><span class="k">Shed idle HVAC</span><span class="v">0.8 lakh rupee/mo</span></div>
+        <div class="row"><span class="k">Shift TOD peak</span><span class="v">1.1 lakh rupee/mo</span></div>
+        <div class="row"><span class="k">Owner</span><span class="v">Utilities · open</span></div>
+      </section>
+    </div>
+
+    <p class="footnote" id="footnote">Indicative example · not plant-verified · Stamped does not replace EMS / MES / PLC</p>
+  </div>
+
+  <script>
+    (function () {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
+      function tween(el, props, duration, delay, ease) {
+        return new Promise((resolve) => {
+          const start = performance.now() + delay;
+          const from = {};
+          const style = getComputedStyle(el);
+          if ("opacity" in props) from.opacity = parseFloat(style.opacity) || 0;
+          if ("y" in props) {
+            from.y = 0;
+            const m = /translate\(([^,]+),\s*([^)]+)\)/.exec(style.transform);
+            // we drive via custom --y / data
+          }
+          const startY = props.startY != null ? props.startY : 10;
+          const endY = props.y != null ? props.y : 0;
+
+          function frame(now) {
+            if (now < start) {
+              requestAnimationFrame(frame);
+              return;
+            }
+            const t = Math.min(1, (now - start) / duration);
+            const e = ease(t);
+            if ("opacity" in props) el.style.opacity = String(from.opacity + (props.opacity - from.opacity) * e);
+            if ("y" in props || props.startY != null) {
+              const y = startY + (endY - startY) * e;
+              const x = props.centerX ? "-50%" : "0px";
+              el.style.transform = props.centerX
+                ? `translate(${x}, ${y}px)`
+                : props.scale
+                  ? `translate(-50%, -50%) scale(${0.9 + 0.1 * e})`
+                  : `translateY(${y}px)`;
+            }
+            if (props.scale && !("y" in props) && props.startY == null) {
+              el.style.transform = `translate(-50%, -50%) scale(${0.9 + 0.1 * e})`;
+            }
+            if (t < 1) requestAnimationFrame(frame);
+            else resolve();
+          }
+          requestAnimationFrame(frame);
+        });
+      }
+
+      async function spawn() {
+        const brand = document.getElementById("brandBar");
+        const sources = [...document.querySelectorAll(".src")];
+        const wires = [...document.querySelectorAll(".wire")];
+        const hub = document.getElementById("hub");
+        const panels = [...document.querySelectorAll(".panel")];
+        const rows = [...document.querySelectorAll(".row")];
+        const footnote = document.getElementById("footnote");
+
+        if (reduce) {
+          [brand, ...sources, hub, ...panels, ...rows, footnote, ...wires].forEach((el) => {
+            el.style.opacity = "1";
+            el.style.transform = "";
+          });
+          return;
+        }
+
+        await tween(brand, { opacity: 1, y: 0, startY: 8 }, 700, 80, easeOutExpo);
+
+        // Sources stagger
+        await Promise.all(
+          sources.map((el, i) =>
+            tween(
+              el,
+              {
+                opacity: 1,
+                y: 0,
+                startY: 10,
+                centerX: el.classList.contains("src--mid"),
+              },
+              650,
+              120 + i * 70,
+              easeOutExpo
+            )
+          )
+        );
+
+        // Draw wires
+        wires.forEach((path, i) => {
+          const len = path.getTotalLength();
+          path.style.strokeDasharray = String(len);
+          path.style.strokeDashoffset = String(len);
+          path.style.opacity = "1";
+          const dur = 700;
+          const delay = i * 60;
+          const start = performance.now() + delay;
+          (function draw(now) {
+            if (now < start) {
+              requestAnimationFrame(draw);
+              return;
+            }
+            const t = Math.min(1, (now - start) / dur);
+            path.style.strokeDashoffset = String(len * (1 - easeOutExpo(t)));
+            if (t < 1) requestAnimationFrame(draw);
+          })(performance.now());
+        });
+
+        await new Promise((r) => setTimeout(r, 520));
+
+        await tween(hub, { opacity: 1, scale: true, startY: 0, y: 0 }, 650, 0, easeOutExpo);
+
+        await Promise.all(
+          panels.map((el, i) =>
+            tween(el, { opacity: 1, y: 0, startY: 14 }, 700, 80 + i * 90, easeOutExpo)
+          )
+        );
+
+        await Promise.all(
+          rows.map((el, i) =>
+            tween(el, { opacity: 1, y: 0, startY: 6 }, 500, 40 + (i % 4) * 55 + Math.floor(i / 4) * 40, easeOutExpo)
+          )
+        );
+
+        await tween(footnote, { opacity: 1, y: 0, startY: 6 }, 500, 60, easeOutExpo);
+      }
+
+      function startPackets() {
+        if (reduce) return;
+        const packets = [...document.querySelectorAll(".packet")];
+        const pathCache = {};
+        packets.forEach((p) => {
+          const id = p.getAttribute("data-path");
+          if (!pathCache[id]) pathCache[id] = document.getElementById(id);
+          p.style.opacity = "1";
+        });
+
+        const speed = 0.00022; // fraction of path per ms
+        let last = performance.now();
+
+        function tick(now) {
+          const dt = now - last;
+          last = now;
+          packets.forEach((p) => {
+            const path = pathCache[p.getAttribute("data-path")];
+            if (!path) return;
+            let phase = parseFloat(p.dataset.phase) || 0;
+            phase = (phase + dt * speed) % 1;
+            p.dataset.phase = String(phase);
+            const len = path.getTotalLength();
+            const pt = path.getPointAtLength(phase * len);
+            p.setAttribute("cx", pt.x);
+            p.setAttribute("cy", pt.y);
+          });
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      spawn().then(startPackets);
+    })();
+  </script>
+</body>
+</html>

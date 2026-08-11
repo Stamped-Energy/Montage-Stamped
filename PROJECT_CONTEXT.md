@@ -26,6 +26,7 @@ Agent reads pipeline manifest (YAML) → reads stage director skill (MD)
 - **Pipeline manifests:** `pipeline_defs/`
 - **Artifact schemas:** `schemas/artifacts/`
 - **Style playbooks:** `styles/*.yaml` (schema: `schemas/styles/playbook.schema.json`)
+- **Active brand pack:** `brand/stamped/` (Stamped Energy — see AGENT_GUIDE Active Brand; default playbook `stamped-industrial`)
 - **Stage director skills:** `skills/pipelines/<pipeline>/<stage>-director.md`
 - **Meta skills:** `skills/meta/*.md` (reviewer, checkpoint-protocol, skill-creator)
 - **Architecture deep-dive:** `docs/ARCHITECTURE.md`

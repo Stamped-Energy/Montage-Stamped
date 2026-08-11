@@ -172,13 +172,15 @@ Choose the structure that best fits the research findings:
 
 #### 3c: Visual Identity — Design It, Don't Pick It
 
-**Your job is to design a visual identity for THIS video, not to pick from a preset menu.**
+**Active brand first.** When `config.yaml` has `brand.active` (this checkout: **Stamped Energy**), default to playbook `stamped-industrial` and follow `brand/stamped/` read-order from AGENT_GUIDE. Do **not** invent a parallel palette, type stack, or motion grammar for Stamped work. Carry the playbook's `taste_profile` into `production_plan`. Only design a custom identity if the user explicitly opts out of brand look, or the brief is clearly non-Stamped.
 
-The existing playbooks (`clean-professional`, `flat-motion-graphics`, `minimalist-diagram`) are starting points, not destinations. Most videos should get a **custom visual identity** derived from the subject matter, audience, and tone. A video about coffee should feel warm and tactile. A video about cybersecurity should feel technical and urgent. A video about marine biology should feel deep and fluid.
+**Your job is to design a visual identity for THIS video, not to pick from a preset menu** — except when an active brand pack already owns the identity (above).
+
+The existing playbooks (`stamped-industrial`, `clean-professional`, `flat-motion-graphics`, `minimalist-diagram`) are starting points, not destinations for *generic* topics. Most non-brand videos should get a **custom visual identity** derived from the subject matter, audience, and tone. A video about coffee should feel warm and tactile. A video about cybersecurity should feel technical and urgent. A video about marine biology should feel deep and fluid.
 
 Before choosing or generating a playbook, read `skills/meta/taste-direction.md` and write a compact `production_plan.taste_profile`. The taste profile records the design read, `visual_variance`, `motion_intensity`, `information_density`, reference strategy, and anti-patterns. Use it to explain why the selected playbook, `composition_mode`, and asset strategy fit the brief.
 
-**How to design visual identity:**
+**How to design visual identity (non-brand / opted-out only):**
 
 1. **Start from the content.** What colors does the subject naturally evoke? What textures, materials, lighting? A video about volcanoes should feel different from a video about meditation — in colors, motion speed, typography weight, and transition style.
 
@@ -191,9 +193,9 @@ Before choosing or generating a playbook, read `skills/meta/taste-direction.md` 
    - Accent: for emphasis, stats, highlights
    - Background: sets the overall mood (light = approachable, dark = dramatic/technical)
 
-5. **Use a preset playbook only when it genuinely fits.** If the video is a straightforward corporate explainer, `clean-professional` is fine. But if the topic has its own visual world (nature, space, food, music, sports, history), design a custom identity.
+5. **Use a preset playbook only when it genuinely fits.** Stamped product work → `stamped-industrial`. Straightforward non-brand corporate → `clean-professional`. Topic with its own visual world (nature, space, food, music, sports, history) → design a custom identity.
 
-6. **Generate a custom playbook when presets don't match.** Use `lib/playbook_generator.py` to create one from your design decisions. The Remotion theme system will automatically derive colors, fonts, and motion from whatever playbook you create — including custom ones.
+6. **Generate a custom playbook when presets don't match and brand is not active.** Use `lib/playbook_generator.py` to create one from your design decisions. The Remotion theme system will automatically derive colors, fonts, and motion from whatever playbook you create — including custom ones.
 
 **Record your visual identity choices in the proposal_packet:**
 - `production_plan.playbook`: name of preset OR "custom"

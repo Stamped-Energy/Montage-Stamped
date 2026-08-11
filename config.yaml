@@ -31,3 +31,12 @@ paths:
   styles_dir: styles
   skills_dir: skills
   output_dir: output
+
+# Active brand pack (Stamped Energy). Agents MUST follow brand/stamped
+# read-order for any production unless the user explicitly opts out.
+brand:
+  active: stamped
+  company: "Stamped Energy"
+  pack_dir: brand/stamped
+  default_playbook: stamped-industrial
+  site: https://stamped.work

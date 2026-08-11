@@ -4,6 +4,31 @@ Start here. This is the complete operating guide and agent contract for OpenMont
 
 For architecture, key files, and conventions see [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md).
 
+## Active Brand — Stamped Energy (MANDATORY)
+
+This checkout is brand-locked to **Stamped Energy**. For **any** production request (video, motion, explainer, launch, website-to-video, atelier, templated, or experimental), treat the brand pack as law — not optional inspiration.
+
+**Pack root:** [`brand/stamped/`](brand/stamped/README.md)  
+**Default playbook:** `stamped-industrial` (`styles/stamped-industrial.yaml`)  
+**Config:** `config.yaml` → `brand.active` / `brand.default_playbook`
+
+### Read-order before creative work
+
+1. [`brand/stamped/context/STAMPED_CONTEXT.md`](brand/stamped/context/STAMPED_CONTEXT.md) — product canon  
+2. [`brand/stamped/context/VOICE_AND_CLAIMS.md`](brand/stamped/context/VOICE_AND_CLAIMS.md) — claims firewall  
+3. [`brand/stamped/DESIGN_VIDEO.md`](brand/stamped/DESIGN_VIDEO.md) + [`brand/stamped/MOTION_LANGUAGE.md`](brand/stamped/MOTION_LANGUAGE.md)  
+4. [`styles/stamped-industrial.yaml`](styles/stamped-industrial.yaml) (and/or [`brand/stamped/visual-styles/stamped-industrial.md`](brand/stamped/visual-styles/stamped-industrial.md))  
+5. Relevant starter under [`brand/stamped/prompts/`](brand/stamped/prompts/) when it matches the brief  
+6. Skim [`brand/stamped/BRAND_BRIDGE.md`](brand/stamped/BRAND_BRIDGE.md) + [`brand/stamped/references/cvector-audit.md`](brand/stamped/references/cvector-audit.md)
+
+### Hard rules
+
+- Default `production_plan.playbook` to **`stamped-industrial`** unless the user explicitly opts out or requests a different look.  
+- Do not invent alternate palettes, type stacks, or motion grammar for “freshness.” Font stack is Space Grotesk / Inter / IBM Plex Mono. Primary accent is Forge Coral `#F75440` on demo-deck `#f7faf5`.  
+- Claims must pass the voice/claims firewall (₹ evidence language; no EMS/MES/CMMS/PLC-replacement claims; no invented fleet metrics; no CVector marks/metrics).  
+- Log playbook selection in `decision_log` with category `playbook_selection`. If the user overrides the brand default, record why.  
+- Depth sources live in `brand/stamped/context/sources/` — open only when you need a quote, ICP table, or architecture detail.
+
 ## First Interaction — Onboarding
 
 When the user's first message is vague, exploratory, or asks what you can do ("make me a video", "what can you do?", "help me create something", "I want to make content"), read the onboarding skill **before** doing anything else:
@@ -630,13 +655,14 @@ Tool rules:
 
 | Playbook | Best For |
 |----------|----------|
-| `clean-professional` | Corporate, educational, SaaS |
+| **`stamped-industrial` (DEFAULT)** | Stamped Energy product explainers, launch teasers, How-it-works, industrial prescription UI — **use unless user opts out** |
+| `clean-professional` | Corporate, educational, SaaS (non-brand / generic only) |
 | `premium-minimalist` | Investor updates, expert explainers, product narratives |
 | `flat-motion-graphics` | Social media, TikTok, startups |
 | `minimalist-diagram` | Technical deep-dives, architecture |
 | `ink-sketch` (Ink Theater) | Hand-drawn ink-on-white doodle animation; a character that draws itself, walks, dances; contraption explainers |
 
-For custom, atelier, brand, launch, or hero work, read `skills/meta/taste-direction.md` before choosing a playbook. Carry its `taste_profile` into the proposal so later stages can preserve the design read, visual variance, motion intensity, information density, reference strategy, and anti-patterns.
+For Stamped work, start from `stamped-industrial` and the Active Brand pack above — do not rebuild a custom look from scratch when the brand playbook already matches. For non-brand / atelier / hero experiments outside Stamped, read `skills/meta/taste-direction.md` before choosing a playbook. Carry its `taste_profile` into the proposal so later stages can preserve the design read, visual variance, motion intensity, information density, reference strategy, and anti-patterns.
 
 ### Hand-drawn "doodle" animation → Ink Theater / Ink Puppet
 

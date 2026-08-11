@@ -293,12 +293,13 @@ Style playbooks (`styles/*.yaml`) define visual language, typography, motion, au
 
 | Playbook | Category | Mood | Best For |
 |----------|----------|------|----------|
+| **`stamped-industrial` (DEFAULT)** | motion-graphics | industrial, rupee-clear, plant-office | Stamped Energy product / launch / HIW — **brand default** |
 | `clean-professional` | motion-graphics | polished, trustworthy | Corporate, educational, SaaS |
 | `premium-minimalist` | minimalist | calm, editorial | Investor updates, expert explainers, product narratives |
 | `flat-motion-graphics` | motion-graphics | energetic, bold | Social media, TikTok, startups |
 | `minimalist-diagram` | whiteboard | focused, technical | Technical deep-dives, architecture |
 
-Load via `styles/playbook_loader.py`: `load_playbook("clean-professional")`
+Active brand pack: `brand/stamped/` (see AGENT_GUIDE). Load via `styles/playbook_loader.py`: `load_playbook("stamped-industrial")`
 
 ## Installed Agent Skills (Layer 3)
 
