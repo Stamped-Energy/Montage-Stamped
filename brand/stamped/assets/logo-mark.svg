@@ -1,27 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Stamped Energy mark">
-  <!--
-    Eight-petal industrial seal.
-    Flat outer edges (octagonal silhouette), inward taper,
-    stepped inner notches → 8-point star negative space with slight clockwise bias.
-  -->
+  <!-- Eight-petal seal · Forge Coral. Flat outer edges, clockwise inner step, center star. -->
   <g fill="#F75440" transform="translate(100 100)">
-    <!-- One petal (pointing up); rotate by 45° × n -->
-    <!-- Outer flat ≈ y=-88, x±34; clockwise step on inner edge -->
-    <path id="petal" d="
-      M -34 -88
-      L  34 -88
-      L  22 -42
-      L   6 -48
-      L   0 -28
-      L -14 -40
-      L -22 -42
-      Z"/>
-    <use href="#petal" transform="rotate(45)"/>
-    <use href="#petal" transform="rotate(90)"/>
-    <use href="#petal" transform="rotate(135)"/>
-    <use href="#petal" transform="rotate(180)"/>
-    <use href="#petal" transform="rotate(225)"/>
-    <use href="#petal" transform="rotate(270)"/>
-    <use href="#petal" transform="rotate(315)"/>
+    <!-- Petal faces up: outer flat, taper, stepped V for turbine bias -->
+    <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z"/>
+    <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(45)"/>
+    <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(90)"/>
+    <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(135)"/>
+    <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(180)"/>
+    <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(225)"/>
+    <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(270)"/>
+    <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(315)"/>
   </g>
 </svg>

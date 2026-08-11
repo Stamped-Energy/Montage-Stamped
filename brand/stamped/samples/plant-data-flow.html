@@ -85,12 +85,19 @@
       min-width: 0;
     }
 
-    .brand-lockup img,
-    .brand-lockup .mark {
+    .brand-lockup .mark-wrap {
       width: 28px;
       height: 28px;
       flex-shrink: 0;
-      display: block;
+      border-radius: 50%;
+      background: #000a07;
+      display: grid;
+      place-items: center;
+    }
+
+    .brand-lockup .mark-wrap .mark {
+      width: 72%;
+      height: 72%;
     }
 
     .brand-name {
@@ -211,9 +218,9 @@
       place-items: center;
       border-radius: 50%;
       background: #000a07;
+      border: 3px solid #ffffff;
       box-shadow:
-        0 0 0 3px #fff,
-        0 0 0 4px var(--coral-soft),
+        0 0 0 1px var(--coral-soft),
         0 10px 28px rgba(25, 28, 26, 0.14);
     }
 
@@ -327,18 +334,20 @@
   <div class="phone" id="phone">
     <header class="brand-bar" id="brandBar">
       <div class="brand-lockup">
-        <svg class="mark" viewBox="0 0 200 200" aria-hidden="true">
-          <g fill="#F75440" transform="translate(100 100)">
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(45)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(90)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(135)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(180)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(225)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(270)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(315)"/>
-          </g>
-        </svg>
+        <div class="mark-wrap" aria-hidden="true">
+          <svg class="mark" viewBox="0 0 200 200">
+            <g fill="#F75440" transform="translate(100 100)">
+              <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z"/>
+              <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(45)"/>
+              <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(90)"/>
+              <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(135)"/>
+              <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(180)"/>
+              <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(225)"/>
+              <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(270)"/>
+              <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(315)"/>
+            </g>
+          </svg>
+        </div>
         <div>
           <div class="brand-name">Stamped Energy</div>
           <div class="brand-tag">Plant-office decision layer</div>
@@ -385,14 +394,14 @@
       <div class="hub" id="hub" aria-label="Stamped mark">
         <svg class="mark" viewBox="0 0 200 200" aria-hidden="true">
           <g fill="#F75440" transform="translate(100 100)">
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(45)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(90)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(135)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(180)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(225)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(270)"/>
-            <path d="M-34-88 L34-88 L22-42 L6-48 L0-28 L-14-40 L-22-42 Z" transform="rotate(315)"/>
+            <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z"/>
+            <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(45)"/>
+            <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(90)"/>
+            <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(135)"/>
+            <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(180)"/>
+            <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(225)"/>
+            <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(270)"/>
+            <path d="M-31.5,-86 L31.5,-86 L20,-38 L8,-46 L2,-30 L-10,-42 L-20,-38 Z" transform="rotate(315)"/>
           </g>
         </svg>
       </div>
@@ -466,12 +475,15 @@
         };
       }
 
-      function hubEdge(diagram, hub, from) {
+      function hubEdge(diagram, hub, from, overshoot = 1.5) {
+        // Aim just inside the hub disc. Hub sits above the SVG (z-index),
+        // so the stroke is visually clipped by the white border + black fill
+        // and reads as a clean connection with no floating gap.
         const d = diagram.getBoundingClientRect();
         const r = hub.getBoundingClientRect();
         const cx = r.left - d.left + r.width / 2;
         const cy = r.top - d.top + r.height / 2;
-        const rad = r.width / 2 + 1;
+        const rad = Math.max(4, r.width / 2 - overshoot);
         const dx = from.x - cx;
         const dy = from.y - cy;
         const len = Math.hypot(dx, dy) || 1;
@@ -514,23 +526,25 @@
         const sL = localPoint(diagram, document.getElementById("srcL"), 0.5, 1);
         const sM = localPoint(diagram, document.getElementById("srcM"), 0.5, 1);
         const sR = localPoint(diagram, document.getElementById("srcR"), 0.5, 1);
-        const pA = localPoint(diagram, document.getElementById("panelStatus"), 0.5, 0);
-        const pB = localPoint(diagram, document.getElementById("panelRx"), 0.5, 0);
+        // Aim outbound lines at left/right thirds of each panel top so they
+        // don't collapse into one center stroke.
+        const pA = localPoint(diagram, document.getElementById("panelStatus"), 0.28, 0);
+        const pB = localPoint(diagram, document.getElementById("panelRx"), 0.72, 0);
 
-        const hL = hubEdge(diagram, hub, sL);
-        const hM = hubEdge(diagram, hub, sM);
-        const hR = hubEdge(diagram, hub, sR);
-        const hA = hubEdge(diagram, hub, pA);
-        const hB = hubEdge(diagram, hub, pB);
+        const hL = hubEdge(diagram, hub, sL, 3);
+        const hM = hubEdge(diagram, hub, sM, 3);
+        const hR = hubEdge(diagram, hub, sR, 3);
+        const hA = hubEdge(diagram, hub, pA, 3);
+        const hB = hubEdge(diagram, hub, pB, 3);
 
         // Inbound: sources → hub rim
-        setPath("pathL", elbow(sL, { x: hL.x, y: hL.y }, (sL.y + hL.y) * 0.55));
+        setPath("pathL", elbow(sL, { x: hL.x, y: hL.y }, (sL.y + hL.cy) * 0.58));
         setPath("pathM", straight(sM, { x: hM.x, y: hM.y }));
-        setPath("pathR", elbow(sR, { x: hR.x, y: hR.y }, (sR.y + hR.y) * 0.55));
+        setPath("pathR", elbow(sR, { x: hR.x, y: hR.y }, (sR.y + hR.cy) * 0.58));
 
-        // Outbound: hub rim → panel tops (short stubs that land on the cards)
-        setPath("pathOutA", straight({ x: hA.x, y: hA.y }, pA));
-        setPath("pathOutB", straight({ x: hB.x, y: hB.y }, pB));
+        // Outbound: hub rim → panel tops
+        setPath("pathOutA", elbow({ x: hA.x, y: hA.y }, pA, (hA.y + pA.y) * 0.55));
+        setPath("pathOutB", elbow({ x: hB.x, y: hB.y }, pB, (hB.y + pB.y) * 0.55));
       }
 
       function drawWiresIn() {
