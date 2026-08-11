@@ -68,7 +68,9 @@ Use the dials to pick one of three paths:
 | Custom playbook | The subject has its own visual world | generated `styles/<name>.yaml` with `taste_profile` |
 | Atelier art direction | Hero work needs a one-off language | `production_plan.art_direction` plus `taste_profile` |
 
-Do not let preset availability override the design read. If the content calls for a custom visual world, write the custom playbook or art direction.
+**Active brand override:** When `config.yaml` has `brand.active` set (this checkout: **Stamped Energy** → `stamped-industrial`), default to that playbook and read `brand/<active>/` before proposing alternatives. Only choose a different path if the user explicitly opts out of brand look, or the brief is clearly non-Stamped. Do not invent a parallel palette/type stack for “freshness.”
+
+Do not let preset availability override the design read. If the content calls for a custom visual world *and* brand is not active / user opted out, write the custom playbook or art direction.
 
 ### 4. Plan References
 
@@ -76,7 +78,7 @@ If the work uses AI image/video, mood boards, brand assets, or atelier compositi
 
 - Use one reference still per scene family or major beat.
 - Do not compress the whole direction into one mood board image.
-- For brand/product work, create or inspect a brand kit before asset generation.
+- For brand/product work, create or inspect a brand kit before asset generation — here: `brand/stamped/` (see AGENT_GUIDE Active Brand).
 - For screen demos, inspect the real UI and write a redesign/audit note before styling overlays.
 
 ### 5. Carry the Profile Downstream

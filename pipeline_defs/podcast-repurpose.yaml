@@ -38,6 +38,7 @@ required_skills:
 
 compatible_playbooks:
   recommended:
+    - stamped-industrial
     - clean-professional
     - flat-motion-graphics
   also_works: []

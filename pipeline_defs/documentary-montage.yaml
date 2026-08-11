@@ -40,6 +40,9 @@ required_skills:
   - meta/checkpoint-protocol
 
 compatible_playbooks:
+  recommended:
+    - stamped-industrial
+  also_works: []
   custom_allowed: true
 
 stages:

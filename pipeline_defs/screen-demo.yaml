@@ -69,6 +69,7 @@ required_skills:
 
 compatible_playbooks:
   recommended:
+    - stamped-industrial
     - minimalist-diagram
     - clean-professional
   also_works: []
