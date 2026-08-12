@@ -135,7 +135,7 @@
       pointer-events: none;
     }
 
-    /* Traveling signal chips — main motion focus */
+    /* Traveling signal chips — match C-Vector-style pin labels */
     .signals {
       position: absolute;
       inset: 0;
@@ -147,53 +147,81 @@
       position: absolute;
       left: 0;
       top: 0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      width: 0;
+      height: 0;
       opacity: 0;
       will-change: transform, opacity;
       white-space: nowrap;
     }
 
-    .chip-dot {
-      width: 6px;
-      height: 6px;
+    /* Black node sits on the wire */
+    .chip-node {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 5px;
+      height: 5px;
+      margin: -2.5px 0 0 -2.5px;
       border-radius: 50%;
       background: var(--ink);
+    }
+
+    /* Label floats above the node with a double-line stem */
+    .chip-label {
+      position: absolute;
+      left: -2px;
+      bottom: 7px;
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+    }
+
+    .chip-stem {
+      position: relative;
+      width: 4px;
+      height: 15px;
       flex-shrink: 0;
     }
 
+    .chip-stem::before,
+    .chip-stem::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: color-mix(in srgb, var(--ink) 82%, transparent);
+    }
+
+    .chip-stem::before { left: 0; }
+    .chip-stem::after { right: 0; }
+
     .chip-name {
       font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-weight: 500;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: var(--ink);
-      background: var(--bg);
-      padding: 0 2px;
+      color: color-mix(in srgb, var(--ink) 88%, transparent);
+      line-height: 1;
+      padding-bottom: 1px;
     }
 
     .chip-tag {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 600;
-      padding: 2px 6px;
-      border: 1px solid var(--ink);
-      background: var(--bg);
-    }
-
-    .chip-tag.is-up {
-      background: var(--tag-pos);
-      border-color: color-mix(in srgb, var(--tag-pos-ink) 35%, var(--ink));
-      color: var(--tag-pos-ink);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      padding: 3px 5px;
+      border-radius: 3px;
+      border: none;
+      background: #2c2c2a;
+      color: #f5f5f3;
     }
 
     .chip-tag.is-down {
-      background: var(--tag-neg);
-      border-color: color-mix(in srgb, var(--tag-neg-ink) 40%, var(--ink));
-      color: var(--tag-neg-ink);
+      background: #4a2c28;
     }
 
     .logo-wrap {
@@ -451,9 +479,10 @@
 
       const LAYOUT = {
         docks: [
-          { id: "wExt", label: "srcExt", dock: "dockExt", yFrac: 0.22 },
-          { id: "wTel", label: "srcTel", dock: "dockTel", yFrac: 0.5 },
-          { id: "wApp", label: "srcApp", dock: "dockApp", yFrac: 0.78 },
+          /* Ext/App: inset left from plant edge + farther from middle */
+          { id: "wExt", label: "srcExt", dock: "dockExt", yFrac: 0.08, xInset: 58 },
+          { id: "wTel", label: "srcTel", dock: "dockTel", yFrac: 0.5, xInset: 0 },
+          { id: "wApp", label: "srcApp", dock: "dockApp", yFrac: 0.92, xInset: 58 },
         ],
         logo: { x: 640, y: 340 },
       };
@@ -525,15 +554,17 @@
         const gap = Math.max(0, lr.left - box.right);
         const turnX = toSvg(box.right + Math.max(72, gap * 0.38), box.top).x;
         const rad = 16;
-        const fan = 48;
+        const fan = 62;
 
         LAYOUT.docks.forEach((dock, i) => {
-          const origin = toSvg(box.right - 4, box.top + box.height * dock.yFrac);
+          const inset = dock.xInset || 0;
+          const origin = toSvg(box.right - 4 - inset, box.top + box.height * dock.yFrac);
           const path = document.getElementById(dock.id);
           const targetY = hubY + (i - 1) * fan;
           const ox = origin.x;
           const oy = origin.y;
-          const mx = Math.min(turnX, hubX - rad * 2);
+          /* Ext/App start further left — give them a longer horizontal run */
+          const mx = Math.min(turnX + (inset > 0 ? inset * 0.35 : 0), hubX - rad * 2);
           const sy = targetY >= oy ? 1 : -1;
           let d;
           if (Math.abs(targetY - oy) < 3) {
@@ -600,9 +631,12 @@
           el.dataset.phase = String(def.phase);
           el.dataset.speed = String(def.speed);
           el.innerHTML =
-            `<span class="chip-dot"></span>` +
+            `<span class="chip-node" aria-hidden="true"></span>` +
+            `<span class="chip-label">` +
+            `<span class="chip-stem" aria-hidden="true"></span>` +
             `<span class="chip-name">${def.name}</span>` +
-            `<span class="chip-tag ${def.dir === "up" ? "is-up" : "is-down"}">${def.tag}</span>`;
+            `<span class="chip-tag ${def.dir === "down" ? "is-down" : ""}">${def.tag}</span>` +
+            `</span>`;
           root.appendChild(el);
         });
       }
@@ -656,7 +690,8 @@
             /* Fade near ends so chips don't pile on plant / origin */
             const edge = phase < 0.04 ? phase / 0.04 : phase > 0.92 ? (1 - phase) / 0.08 : 1;
             chip.style.opacity = String(0.15 + 0.85 * edge);
-            chip.style.transform = `translate(${screen.x}px, ${screen.y}px) translate(-12px, -50%)`;
+            /* Node sits exactly on the path point */
+            chip.style.transform = `translate(${screen.x}px, ${screen.y}px)`;
           });
           chipRaf = requestAnimationFrame(tick);
         })(performance.now());
@@ -729,7 +764,7 @@
             const pt = path.getPointAtLength(path.getTotalLength() * CHIP_DEFS[i].phase);
             const screen = svgToScreen(pt.x, pt.y);
             c.style.opacity = "1";
-            c.style.transform = `translate(${screen.x}px, ${screen.y}px) translate(-12px, -50%)`;
+            c.style.transform = `translate(${screen.x}px, ${screen.y}px)`;
           });
           return;
         }
