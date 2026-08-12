@@ -163,9 +163,9 @@
       position: absolute;
       left: 0;
       top: 0;
-      width: 5px;
-      height: 5px;
-      margin: -2.5px 0 0 -2.5px;
+      width: 6px;
+      height: 6px;
+      margin: -3px 0 0 -3px;
       border-radius: 50%;
       background: var(--ink);
     }
@@ -174,16 +174,16 @@
     .chip-label {
       position: absolute;
       left: -2px;
-      bottom: 7px;
+      bottom: 8px;
       display: flex;
       align-items: flex-end;
-      gap: 5px;
+      gap: 6px;
     }
 
     .chip-stem {
       position: relative;
-      width: 4px;
-      height: 15px;
+      width: 5px;
+      height: 18px;
       flex-shrink: 0;
     }
 
@@ -202,7 +202,7 @@
 
     .chip-name {
       font-family: var(--font-label);
-      font-size: 9px;
+      font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.05em;
       text-transform: uppercase;
@@ -215,11 +215,11 @@
       display: inline-flex;
       align-items: center;
       font-family: var(--font-label);
-      font-size: 8px;
+      font-size: 10px;
       font-weight: 600;
       letter-spacing: 0.02em;
       line-height: 1;
-      padding: 3px 5px;
+      padding: 4px 7px;
       border-radius: 3px;
       border: none;
       background: #2c2c2a;
@@ -466,14 +466,13 @@
       const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
       /* Signal chips that travel the wires forever after open */
+      /* Fewer chips, slower travel — ~1–2 visible mid-path at a time */
       const CHIP_DEFS = [
-        { path: "wExt", name: "TOU tariff", tag: "↑ 6%", dir: "up", phase: 0.05, speed: 0.000095 },
-        { path: "wExt", name: "Peak window", tag: "↓ 3%", dir: "down", phase: 0.38, speed: 0.000088 },
-        { path: "wExt", name: "Feedstock", tag: "↑ 8%", dir: "up", phase: 0.72, speed: 0.0001 },
-        { path: "wTel", name: "Power draw", tag: "↑ 8%", dir: "up", phase: 0.12, speed: 0.00011 },
-        { path: "wTel", name: "Incomer MD", tag: "↑ 4%", dir: "up", phase: 0.55, speed: 0.000092 },
-        { path: "wApp", name: "Demand forecast", tag: "↑ 5%", dir: "up", phase: 0.18, speed: 0.000098 },
-        { path: "wApp", name: "Shift plan", tag: "↑ 2%", dir: "up", phase: 0.62, speed: 0.000105 },
+        { path: "wExt", name: "Feedstock", tag: "↑ 8%", dir: "up", phase: 0.22, speed: 0.000042 },
+        { path: "wExt", name: "TOU tariff", tag: "↑ 6%", dir: "up", phase: 0.78, speed: 0.000038 },
+        { path: "wTel", name: "Power draw", tag: "↑ 8%", dir: "up", phase: 0.4, speed: 0.00004 },
+        { path: "wApp", name: "Shift plan", tag: "↑ 2%", dir: "up", phase: 0.15, speed: 0.000039 },
+        { path: "wApp", name: "Demand forecast", tag: "↑ 5%", dir: "up", phase: 0.68, speed: 0.000036 },
       ];
 
       /* 9 recommendations — only 2 visible; carousel after open */
@@ -699,8 +698,8 @@
             const len = path.getTotalLength();
             const pt = path.getPointAtLength(phase * len);
             const screen = svgToScreen(pt.x, pt.y);
-            /* Fade near ends so chips don't pile on plant / origin */
-            const edge = phase < 0.04 ? phase / 0.04 : phase > 0.92 ? (1 - phase) / 0.08 : 1;
+            /* Longer fade at ends → fewer chips readable at once */
+            const edge = phase < 0.1 ? phase / 0.1 : phase > 0.86 ? (1 - phase) / 0.14 : 1;
             chip.style.opacity = String(0.15 + 0.85 * edge);
             /* Node sits exactly on the path point */
             chip.style.transform = `translate(${screen.x}px, ${screen.y}px)`;
