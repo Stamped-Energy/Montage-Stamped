@@ -195,19 +195,19 @@
     .logo-wrap {
       position: absolute;
       z-index: 4;
-      left: 50%;
+      left: 58%;
       top: 50%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       opacity: 0;
       transform: translate(-50%, -50%) translateY(8px);
     }
 
     .logo-wrap img {
-      width: min(168px, 18vw);
-      height: min(168px, 18vw);
+      width: min(118px, 13vw);
+      height: min(118px, 13vw);
       display: block;
     }
 
@@ -342,7 +342,7 @@
 
     @media (max-width: 900px) {
       .plant { width: min(220px, 30%); left: 2%; }
-      .logo-wrap img { width: min(120px, 22vw); height: min(120px, 22vw); }
+      .logo-wrap img { width: min(96px, 16vw); height: min(96px, 16vw); }
       .rx-panel { width: min(280px, 38vw); }
       .rx-copy { font-size: 12px; }
       :root { --rx-h: 72px; }
@@ -392,7 +392,7 @@
       <div class="signals" id="signals" aria-hidden="true"></div>
 
       <div class="logo-wrap" id="logoWrap">
-        <img src="../assets/logo-mark.png" width="168" height="168" alt="" />
+        <img src="../assets/logo-mark.png" width="118" height="118" alt="" />
         <div class="logo-caption">Stamped</div>
       </div>
 
@@ -441,9 +441,9 @@
 
       const LAYOUT = {
         docks: [
-          { id: "wExt", label: "srcExt", dock: "dockExt", yFrac: 0.22 },
+          { id: "wExt", label: "srcExt", dock: "dockExt", yFrac: 0.14 },
           { id: "wTel", label: "srcTel", dock: "dockTel", yFrac: 0.5 },
-          { id: "wApp", label: "srcApp", dock: "dockApp", yFrac: 0.78 },
+          { id: "wApp", label: "srcApp", dock: "dockApp", yFrac: 0.86 },
         ],
         logo: { x: 640, y: 340 },
       };
@@ -506,21 +506,38 @@
         }
 
         const logoCenter = toSvg(lr.left + lr.width / 2, lr.top + lr.height / 2);
-        const logoLeft = toSvg(lr.left + 4, lr.top + lr.height / 2);
-        const hub = { x: logoLeft.x, y: logoCenter.y };
+        const logoLeft = toSvg(lr.left + 2, lr.top + lr.height / 2);
+        const hubX = logoLeft.x;
+        const hubY = logoCenter.y;
+        /* Horizontal run length before the elbow turn toward the mark */
+        const turnX = toSvg(pr.right + Math.max(120, (lr.left - pr.right) * 0.42), pr.top).x;
+        const rad = 18;
+        const fan = 42;
 
         LAYOUT.docks.forEach((dock, i) => {
           const origin = toSvg(pr.right - 2, pr.top + pr.height * dock.yFrac);
           const path = document.getElementById(dock.id);
-          /* Fan slightly so three curves don't fully overlap into the mark */
-          const targetY = hub.y + (i - 1) * 18;
-          const dx = hub.x - origin.x;
-          const c1x = origin.x + dx * 0.35;
-          const c2x = origin.x + dx * 0.7;
-          path.setAttribute(
-            "d",
-            `M ${origin.x} ${origin.y} C ${c1x} ${origin.y}, ${c2x} ${targetY}, ${hub.x} ${targetY}`
-          );
+          const targetY = hubY + (i - 1) * fan;
+          const ox = origin.x;
+          const oy = origin.y;
+          const mx = Math.min(turnX, hubX - rad * 2);
+          const sy = targetY >= oy ? 1 : -1;
+          let d;
+          if (Math.abs(targetY - oy) < 2) {
+            /* Middle run: straight horizontal into the mark */
+            d = `M ${ox} ${oy} L ${hubX} ${oy}`;
+          } else {
+            /* Horizontal first, then elbow toward hub */
+            d = [
+              `M ${ox} ${oy}`,
+              `L ${mx - rad} ${oy}`,
+              `Q ${mx} ${oy} ${mx} ${oy + sy * rad}`,
+              `L ${mx} ${targetY - sy * rad}`,
+              `Q ${mx} ${targetY} ${mx + rad} ${targetY}`,
+              `L ${hubX} ${targetY}`,
+            ].join(" ");
+          }
+          path.setAttribute("d", d);
 
           const screen = svgToScreen(origin.x, origin.y);
           const label = document.getElementById(dock.label);
