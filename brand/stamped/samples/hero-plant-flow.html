@@ -65,25 +65,14 @@
       opacity: 0;
     }
 
-    .wire-out {
-      fill: none;
-      stroke: var(--line);
-      stroke-width: 1.25;
-      opacity: 0;
-    }
-
-    .globe-group { opacity: 0; }
-    .iso-stroke { stroke: var(--ink); stroke-width: 1.5; fill: none; }
-    .iso-face { fill: #f7f7f5; stroke: var(--ink); stroke-width: 1.5; }
-
     /* Plant photo placeholder — replace src later */
     .plant {
       position: absolute;
-      left: 38%;
+      left: 3.5%;
       top: 50%;
-      width: min(340px, 32%);
+      width: min(300px, 26%);
       aspect-ratio: 5 / 4;
-      transform: translate(-20%, -50%);
+      transform: translateY(-50%);
       z-index: 1;
       opacity: 0;
       overflow: hidden;
@@ -126,7 +115,20 @@
       padding: 6px 10px;
       white-space: nowrap;
       opacity: 0;
-      transform: translateY(6px);
+      transform: translate(-50%, calc(-100% - 12px));
+      pointer-events: none;
+    }
+
+    .dock-dot {
+      position: absolute;
+      z-index: 4;
+      width: 8px;
+      height: 8px;
+      margin: -4px 0 0 -4px;
+      border-radius: 50%;
+      background: var(--ink);
+      opacity: 0;
+      pointer-events: none;
     }
 
     /* Traveling signal chips — main motion focus */
@@ -193,28 +195,30 @@
     .logo-wrap {
       position: absolute;
       z-index: 4;
+      left: 50%;
+      top: 50%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 14px;
       opacity: 0;
-      transform: translateY(8px);
+      transform: translate(-50%, -50%) translateY(8px);
     }
 
     .logo-wrap img {
-      width: 52px;
-      height: 52px;
+      width: min(168px, 18vw);
+      height: min(168px, 18vw);
       display: block;
     }
 
     .logo-caption {
       background: var(--ink);
       color: #f7f7f5;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      padding: 5px 9px;
+      padding: 6px 12px;
     }
 
     /* Recommendations: viewport shows 2 slots; track slides up */
@@ -337,17 +341,19 @@
     }
 
     @media (max-width: 900px) {
-      .plant { width: min(280px, 36%); left: 36%; }
+      .plant { width: min(220px, 30%); left: 2%; }
+      .logo-wrap img { width: min(120px, 22vw); height: min(120px, 22vw); }
       .rx-panel { width: min(280px, 38vw); }
       .rx-copy { font-size: 12px; }
       :root { --rx-h: 72px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .plant, .globe-group, .src-label, .rx-panel, .rx-live, .logo-wrap, .footnote, .wire, .wire-out {
+      .plant, .src-label, .dock-dot, .rx-panel, .rx-live, .logo-wrap, .footnote, .wire {
         opacity: 1 !important;
-        transform: none !important;
       }
+      .logo-wrap { transform: translate(-50%, -50%) !important; }
+      .src-label { transform: translate(-50%, calc(-100% - 12px)) !important; }
       .rx-track { transition: none !important; }
       .chip { opacity: 0.85 !important; }
     }
@@ -373,25 +379,20 @@
         <path class="wire" id="wExt" />
         <path class="wire" id="wTel" />
         <path class="wire" id="wApp" />
-        <path class="wire-out" id="wOut" />
-
-        <g class="globe-group" id="globe" transform="translate(90,175)">
-          <circle cx="0" cy="0" r="26" class="iso-face" />
-          <ellipse cx="0" cy="0" rx="11" ry="26" class="iso-stroke" />
-          <path d="M-26 0 H26" class="iso-stroke" />
-          <path d="M-22 -13 C-7 -17 7 -17 22 -13" class="iso-stroke" />
-          <path d="M-22 13 C-7 17 7 17 22 13" class="iso-stroke" />
-        </g>
       </svg>
 
-      <div class="src-label" id="srcExt" style="left: 4.2%; top: 13%;">External signals</div>
-      <div class="src-label" id="srcTel" style="left: 4.2%; top: 41%;">Plant telemetry</div>
-      <div class="src-label" id="srcApp" style="left: 4.2%; top: 67%;">Application data</div>
+      <span class="dock-dot" id="dockExt" aria-hidden="true"></span>
+      <span class="dock-dot" id="dockTel" aria-hidden="true"></span>
+      <span class="dock-dot" id="dockApp" aria-hidden="true"></span>
+
+      <div class="src-label" id="srcExt">External signals</div>
+      <div class="src-label" id="srcTel">Plant telemetry</div>
+      <div class="src-label" id="srcApp">Application data</div>
 
       <div class="signals" id="signals" aria-hidden="true"></div>
 
-      <div class="logo-wrap" id="logoWrap" style="left: 72%; top: 68%;">
-        <img src="../assets/logo-mark.png" width="52" height="52" alt="" />
+      <div class="logo-wrap" id="logoWrap">
+        <img src="../assets/logo-mark.png" width="168" height="168" alt="" />
         <div class="logo-caption">Stamped</div>
       </div>
 
@@ -439,10 +440,12 @@
       ];
 
       const LAYOUT = {
-        globe: { x: 90, y: 175 },
-        plantIn: { x: 560, y: 350 },
-        plantOut: { x: 780, y: 420 },
-        logo: { x: 980, y: 520 },
+        docks: [
+          { id: "wExt", label: "srcExt", dock: "dockExt", yFrac: 0.22 },
+          { id: "wTel", label: "srcTel", dock: "dockTel", yFrac: 0.5 },
+          { id: "wApp", label: "srcApp", dock: "dockApp", yFrac: 0.78 },
+        ],
+        logo: { x: 640, y: 340 },
       };
 
       let chipRaf = 0;
@@ -459,6 +462,7 @@
           const start = performance.now() + delay;
           const fromOp = parseFloat(getComputedStyle(el).opacity) || 0;
           const startY = props.startY != null ? props.startY : 8;
+          const mode = props.mode || "y";
           (function frame(now) {
             if (now < start) return requestAnimationFrame(frame);
             const t = Math.min(1, (now - start) / duration);
@@ -466,7 +470,15 @@
             if ("opacity" in props) {
               el.style.opacity = String(fromOp + (props.opacity - fromOp) * e);
             }
-            if (props.y != null || props.startY != null) {
+            if (mode === "logo") {
+              const y = startY * (1 - e);
+              el.style.transform = `translate(-50%, -50%) translateY(${y}px)`;
+            } else if (mode === "plant") {
+              const y = startY * (1 - e);
+              el.style.transform = `translateY(calc(-50% + ${y}px))`;
+            } else if (mode === "label") {
+              el.style.transform = `translate(-50%, calc(-100% - ${12 - 6 * e}px))`;
+            } else if (props.y != null || props.startY != null) {
               const y = startY + ((props.y != null ? props.y : 0) - startY) * e;
               el.style.transform = `translateY(${y}px)`;
             }
@@ -476,63 +488,48 @@
         });
       }
 
-      function tweenSvg(el, toOp, duration, delay = 0) {
-        return new Promise((resolve) => {
-          const start = performance.now() + delay;
-          const from = parseFloat(el.style.opacity || "0") || 0;
-          (function frame(now) {
-            if (now < start) return requestAnimationFrame(frame);
-            const t = Math.min(1, (now - start) / duration);
-            el.style.opacity = String(from + (toOp - from) * easeOutExpo(t));
-            if (t < 1) requestAnimationFrame(frame);
-            else resolve();
-          })(performance.now());
-        });
-      }
-
       function layoutPaths() {
-        const L = LAYOUT;
         const plant = document.getElementById("plant");
+        const logo = document.getElementById("logoWrap");
         const svg = document.getElementById("svg");
-
-        /* Aim wires at plant edges in viewBox space */
         const pr = plant.getBoundingClientRect();
+        const lr = logo.getBoundingClientRect();
         const ctm = svg.getScreenCTM();
-        if (ctm) {
-          const inv = ctm.inverse();
-          const pt = svg.createSVGPoint();
-          pt.x = pr.left + 4;
-          pt.y = pr.top + pr.height * 0.42;
-          const sp = pt.matrixTransform(inv);
-          L.plantIn = { x: sp.x, y: sp.y };
+        if (!ctm) return;
+        const inv = ctm.inverse();
 
-          pt.x = pr.right - 8;
-          pt.y = pr.top + pr.height * 0.62;
-          const out = pt.matrixTransform(inv);
-          L.plantOut = { x: out.x, y: out.y };
+        function toSvg(screenX, screenY) {
+          const pt = svg.createSVGPoint();
+          pt.x = screenX;
+          pt.y = screenY;
+          return pt.matrixTransform(inv);
         }
 
-        document.getElementById("wExt").setAttribute(
-          "d",
-          `M ${L.globe.x + 26} ${L.globe.y + 6} L 240 220 L ${L.plantIn.x} ${L.plantIn.y - 36}`
-        );
-        document.getElementById("wTel").setAttribute(
-          "d",
-          `M 130 340 L 320 340 L ${L.plantIn.x} ${L.plantIn.y}`
-        );
-        document.getElementById("wApp").setAttribute(
-          "d",
-          `M 130 500 L 300 470 L ${L.plantIn.x} ${L.plantIn.y + 40}`
-        );
-        document.getElementById("wOut").setAttribute(
-          "d",
-          `M ${L.plantOut.x} ${L.plantOut.y} L ${L.logo.x - 40} ${L.logo.y - 10}`
-        );
+        const logoCenter = toSvg(lr.left + lr.width / 2, lr.top + lr.height / 2);
+        const logoLeft = toSvg(lr.left + 4, lr.top + lr.height / 2);
+        const hub = { x: logoLeft.x, y: logoCenter.y };
 
-        const logoWrap = document.getElementById("logoWrap");
-        const logoScreen = svgToScreen(L.logo.x, L.logo.y);
-        logoWrap.style.left = `${logoScreen.x - 26}px`;
-        logoWrap.style.top = `${logoScreen.y - 26}px`;
+        LAYOUT.docks.forEach((dock, i) => {
+          const origin = toSvg(pr.right - 2, pr.top + pr.height * dock.yFrac);
+          const path = document.getElementById(dock.id);
+          /* Fan slightly so three curves don't fully overlap into the mark */
+          const targetY = hub.y + (i - 1) * 18;
+          const dx = hub.x - origin.x;
+          const c1x = origin.x + dx * 0.35;
+          const c2x = origin.x + dx * 0.7;
+          path.setAttribute(
+            "d",
+            `M ${origin.x} ${origin.y} C ${c1x} ${origin.y}, ${c2x} ${targetY}, ${hub.x} ${targetY}`
+          );
+
+          const screen = svgToScreen(origin.x, origin.y);
+          const label = document.getElementById(dock.label);
+          const dot = document.getElementById(dock.dock);
+          label.style.left = `${screen.x}px`;
+          label.style.top = `${screen.y}px`;
+          dot.style.left = `${screen.x}px`;
+          dot.style.top = `${screen.y}px`;
+        });
       }
 
       function svgToScreen(x, y) {
@@ -667,11 +664,15 @@
         buildRx();
 
         const plant = document.getElementById("plant");
-        const globe = document.getElementById("globe");
         const srcs = [
           document.getElementById("srcExt"),
           document.getElementById("srcTel"),
           document.getElementById("srcApp"),
+        ];
+        const docks = [
+          document.getElementById("dockExt"),
+          document.getElementById("dockTel"),
+          document.getElementById("dockApp"),
         ];
         const logo = document.getElementById("logoWrap");
         const panel = document.getElementById("rxPanel");
@@ -680,14 +681,17 @@
         const wExt = document.getElementById("wExt");
         const wTel = document.getElementById("wTel");
         const wApp = document.getElementById("wApp");
-        const wOut = document.getElementById("wOut");
 
         if (reduce) {
-          [plant, globe, logo, panel, live, footnote, ...srcs].forEach((el) => {
+          [plant, logo, panel, live, footnote, ...srcs, ...docks].forEach((el) => {
             el.style.opacity = "1";
-            el.style.transform = "none";
           });
-          [wExt, wTel, wApp, wOut].forEach((w) => {
+          plant.style.transform = "translateY(-50%)";
+          logo.style.transform = "translate(-50%, -50%)";
+          srcs.forEach((el) => {
+            el.style.transform = "translate(-50%, calc(-100% - 12px))";
+          });
+          [wExt, wTel, wApp].forEach((w) => {
             w.style.opacity = "1";
             w.style.strokeDasharray = "none";
             w.style.strokeDashoffset = "0";
@@ -702,14 +706,15 @@
           return;
         }
 
-        /* Opening: plant + sources + wires once */
-        await Promise.all([
-          tween(plant, { opacity: 1, y: 0, startY: 10 }, 650, 0),
-          tweenSvg(globe, 1, 550, 60),
-        ]);
+        /* Opening: plant left → docks/labels → wires into large Stamped mark */
+        await tween(plant, { opacity: 1, mode: "plant", startY: 10 }, 650, 0);
+        await tween(logo, { opacity: 1, mode: "logo", startY: 10 }, 620, 40);
         layoutPaths();
 
-        await Promise.all(srcs.map((el, i) => tween(el, { opacity: 1, y: 0, startY: 6 }, 420, i * 70)));
+        await Promise.all([
+          ...srcs.map((el, i) => tween(el, { opacity: 1, mode: "label" }, 420, i * 70)),
+          ...docks.map((el, i) => tween(el, { opacity: 1 }, 320, 40 + i * 70)),
+        ]);
 
         await Promise.all([
           drawWire(wExt, 880, 0),
@@ -717,17 +722,12 @@
           drawWire(wApp, 880, 200),
         ]);
 
-        /* Chips start traveling and keep going for the whole session */
         startChipLoop();
 
-        await tween(logo, { opacity: 1, y: 0, startY: 8 }, 480, 80);
-        await drawWire(wOut, 620, 0);
-
-        await tween(panel, { opacity: 1, y: 0, startY: 10 }, 520, 40);
+        await tween(panel, { opacity: 1, y: 0, startY: 10 }, 520, 80);
         await tween(live, { opacity: 1 }, 280, 40);
         await tween(footnote, { opacity: 1 }, 360, 0);
 
-        /* Steady state: recommendations carousel only */
         startCarousel();
       }
 
