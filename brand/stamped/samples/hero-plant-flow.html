@@ -104,7 +104,7 @@
     }
 
     .col-label--plant { left: 4.5%; }
-    .col-label--intel { left: 50%; transform: translate(-50%, 8px); }
+    .col-label--intel { left: 48%; transform: translate(-50%, 8px); }
     .col-label--rx { right: 5%; align-items: flex-end; }
 
     .col-title {
@@ -209,7 +209,7 @@
 
     .hub {
       position: absolute;
-      left: 50%;
+      left: 48%;
       top: 52%;
       width: 108px;
       height: 108px;
@@ -279,7 +279,7 @@
 
     .hub-caption {
       position: absolute;
-      left: 50%;
+      left: 48%;
       top: calc(52% + 72px);
       transform: translateX(-50%);
       font-size: 10px;
@@ -311,7 +311,7 @@
     }
 
     .wire-out {
-      stroke: color-mix(in srgb, var(--coral) 45%, var(--line));
+      stroke: color-mix(in srgb, var(--coral) 50%, var(--line));
     }
 
     .packets {
@@ -356,19 +356,110 @@
       box-shadow: 0 4px 12px rgba(25, 28, 26, 0.05);
     }
 
-    /* Rx shells reserved for commit 2 — present but inert */
     .rx-stack {
       position: absolute;
       right: 4.5%;
-      top: 22%;
-      width: min(280px, 28%);
+      top: 20%;
+      width: min(292px, 30%);
       display: flex;
       flex-direction: column;
       gap: 10px;
       z-index: 4;
+    }
+
+    .rx-card {
+      background: var(--card);
+      border: 1px solid color-mix(in srgb, var(--hairline) 88%, transparent);
+      border-radius: 8px;
+      padding: 12px 14px 13px;
+      box-shadow: 0 6px 18px rgba(25, 28, 26, 0.04);
       opacity: 0;
-      pointer-events: none;
-      visibility: hidden;
+      transform: translateY(12px) scale(0.96);
+      transform-origin: center top;
+    }
+
+    .rx-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--coral);
+      opacity: 0;
+      transform: translateY(4px);
+      margin-bottom: 6px;
+    }
+
+    .rx-live::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--coral);
+    }
+
+    .rx-value {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--coral);
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .rx-cat {
+      margin-top: 4px;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--mute);
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    .rx-action {
+      margin-top: 8px;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: -0.015em;
+      line-height: 1.25;
+      color: var(--ink);
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .rx-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      align-self: flex-start;
+      margin-top: 2px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--hairline) 80%, transparent);
+      background: var(--panel);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .rx-footer-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 2px solid var(--coral);
+      box-shadow: inset 0 0 0 1.5px var(--card);
+      flex-shrink: 0;
     }
 
     .footnote {
@@ -381,16 +472,20 @@
       padding-top: 4px;
     }
 
-    @media (max-width: 820px) {
-      .docks { left: 26%; width: 22%; }
+    @media (max-width: 900px) {
+      .docks { left: 26%; width: 20%; }
       .packet-name { font-size: 8px; padding: 2px 6px; }
-      .hub { width: 88px; height: 88px; }
+      .hub { width: 88px; height: 88px; left: 46%; }
       .hub-core { width: 78px; height: 78px; }
-      .hub-caption { top: calc(52% + 58px); }
+      .hub-caption { left: 46%; top: calc(52% + 58px); }
+      .rx-stack { width: min(250px, 34%); }
+      .rx-value { font-size: 24px; }
+      .rx-action { font-size: 13px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .brand-bar, .col-label, .plant, .hub, .hub-caption, .dock-label, .dock-anchor, .footnote {
+      .brand-bar, .col-label, .plant, .hub, .hub-caption, .dock-label, .dock-anchor,
+      .footnote, .rx-card, .rx-live, .rx-value, .rx-cat, .rx-action, .rx-footer {
         opacity: 1 !important;
         transform: none !important;
       }
@@ -482,19 +577,19 @@
       </svg>
 
       <div class="packets" id="packets" aria-hidden="true">
-        <div class="packet" data-path="path0" data-name="Energy meters">
+        <div class="packet" data-path="path0">
           <span class="packet-dot"></span>
           <span class="packet-name">Energy meters</span>
         </div>
-        <div class="packet" data-path="path1" data-name="SCADA / PLC">
+        <div class="packet" data-path="path1">
           <span class="packet-dot"></span>
           <span class="packet-name">SCADA / PLC</span>
         </div>
-        <div class="packet" data-path="path2" data-name="Production">
+        <div class="packet" data-path="path2">
           <span class="packet-dot"></span>
           <span class="packet-name">Production</span>
         </div>
-        <div class="packet" data-path="path3" data-name="Utility &amp; tariff">
+        <div class="packet" data-path="path3">
           <span class="packet-dot"></span>
           <span class="packet-name">Utility &amp; tariff</span>
         </div>
@@ -510,7 +605,30 @@
       </div>
       <div class="hub-caption" id="hubCaption">Stamped Intelligence</div>
 
-      <div class="rx-stack" id="rxStack" aria-hidden="true"></div>
+      <div class="rx-stack" id="rxStack">
+        <article class="rx-card" data-rx="0">
+          <div class="rx-live">Live</div>
+          <div class="rx-value">₹2.4M</div>
+          <div class="rx-cat">Annual savings</div>
+          <div class="rx-action">Optimize Shift 2 planning</div>
+        </article>
+        <article class="rx-card" data-rx="1">
+          <div class="rx-live">Live</div>
+          <div class="rx-value">₹165K</div>
+          <div class="rx-cat">Off-spec risk</div>
+          <div class="rx-action">Correct feedstock setpoint</div>
+        </article>
+        <article class="rx-card" data-rx="2">
+          <div class="rx-live">Live</div>
+          <div class="rx-value">₹980K</div>
+          <div class="rx-cat">Demand charge</div>
+          <div class="rx-action">Stagger peak-load assets</div>
+        </article>
+        <div class="rx-footer" id="rxFooter">
+          <span class="rx-footer-dot" aria-hidden="true"></span>
+          12 actions identified
+        </div>
+      </div>
     </div>
 
     <p class="footnote" id="footnote">Indicative example · not plant-verified · Stamped does not replace EMS / MES / PLC</p>
@@ -521,23 +639,30 @@
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
-      let cancelled = false;
-      let packetRaf = 0;
+      let runId = 0;
+      let loopTimer = 0;
+      let activeToken = null;
 
-      function sleep(ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
+      function sleep(ms, token) {
+        return new Promise((resolve) => {
+          const id = setTimeout(() => resolve(!token.cancelled), ms);
+          if (token.cancelled) {
+            clearTimeout(id);
+            resolve(false);
+          }
+        });
       }
 
-      function tween(el, props, duration, delay, ease) {
+      function tween(el, props, duration, delay, ease, token) {
         return new Promise((resolve) => {
-          if (cancelled) return resolve();
+          if (token.cancelled) return resolve();
           const start = performance.now() + delay;
           const from = {};
           const style = getComputedStyle(el);
           if ("opacity" in props) from.opacity = parseFloat(style.opacity) || 0;
 
           function frame(now) {
-            if (cancelled) return resolve();
+            if (token.cancelled) return resolve();
             if (now < start) {
               requestAnimationFrame(frame);
               return;
@@ -550,6 +675,10 @@
             if (props.hubScale) {
               const s = 0.92 + 0.08 * e;
               el.style.transform = `translate(-50%, -50%) scale(${s})`;
+            } else if (props.card) {
+              const y = 12 * (1 - e);
+              const s = 0.96 + 0.04 * e;
+              el.style.transform = `translateY(${y}px) scale(${s})`;
             } else if (props.centerX) {
               const y = (props.startY != null ? props.startY : 8) * (1 - e);
               el.style.transform = `translate(-50%, ${y}px)`;
@@ -604,6 +733,7 @@
         const diagram = document.getElementById("diagram");
         const hub = document.getElementById("hub");
         const svg = document.getElementById("wires");
+        const cards = document.querySelectorAll(".rx-card");
         const w = diagram.clientWidth;
         const h = diagram.clientHeight;
         svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
@@ -614,31 +744,29 @@
           const dock = document.getElementById(`dock${i}`);
           const a = localPoint(diagram, dock, 0.5, 0.5);
           const rim = hubRim(diagram, hub, a, 3);
-          const path = document.getElementById(`path${i}`);
-          path.setAttribute("d", curveToHub(a, { x: rim.x, y: rim.y }));
+          document.getElementById(`path${i}`).setAttribute("d", curveToHub(a, { x: rim.x, y: rim.y }));
         }
 
-        const outTarget = {
-          x: diagram.clientWidth * 0.78,
-          y: diagram.clientHeight * 0.52,
-        };
+        const outTarget = cards[1]
+          ? localPoint(diagram, cards[1], 0, 0.5)
+          : { x: w * 0.78, y: h * 0.52 };
         const outRim = hubRim(diagram, hub, outTarget, 3);
         document.getElementById("pathOut").setAttribute(
           "d",
-          `M ${outRim.x} ${outRim.y} L ${outTarget.x} ${outTarget.y}`
+          `M ${outRim.x} ${outRim.y} C ${outRim.x + (outTarget.x - outRim.x) * 0.45} ${outRim.y}, ${outTarget.x - 24} ${outTarget.y}, ${outTarget.x} ${outTarget.y}`
         );
       }
 
-      function drawPath(path, duration, delay) {
+      function drawPath(path, duration, delay, token) {
         return new Promise((resolve) => {
-          if (cancelled) return resolve();
+          if (token.cancelled) return resolve();
           const len = path.getTotalLength();
           path.style.strokeDasharray = String(len);
           path.style.strokeDashoffset = String(len);
           path.style.opacity = "1";
           const start = performance.now() + delay;
           (function frame(now) {
-            if (cancelled) return resolve();
+            if (token.cancelled) return resolve();
             if (now < start) return requestAnimationFrame(frame);
             const t = Math.min(1, (now - start) / duration);
             path.style.strokeDashoffset = String(len * (1 - easeOutExpo(t)));
@@ -648,14 +776,14 @@
         });
       }
 
-      function runPacket(packet, path, duration, delay) {
+      function runPacket(packet, path, duration, delay, token) {
         return new Promise((resolve) => {
-          if (cancelled) return resolve();
+          if (token.cancelled) return resolve();
           const start = performance.now() + delay;
           const len = path.getTotalLength();
 
           (function frame(now) {
-            if (cancelled) return resolve();
+            if (token.cancelled) return resolve();
             if (now < start) {
               requestAnimationFrame(frame);
               return;
@@ -674,7 +802,71 @@
         });
       }
 
-      async function inboundSequence() {
+      async function assembleCard(card, token) {
+        await tween(card, { opacity: 1, card: true }, 480, 0, easeOutExpo, token);
+        const live = card.querySelector(".rx-live");
+        const value = card.querySelector(".rx-value");
+        const cat = card.querySelector(".rx-cat");
+        const action = card.querySelector(".rx-action");
+        await tween(live, { opacity: 1, y: 0, startY: 4 }, 280, 0, easeOutExpo, token);
+        await Promise.all([
+          tween(value, { opacity: 1, y: 0, startY: 6 }, 360, 20, easeOutExpo, token),
+          tween(cat, { opacity: 1, y: 0, startY: 4 }, 320, 60, easeOutExpo, token),
+        ]);
+        await tween(action, { opacity: 1, y: 0, startY: 6 }, 360, 20, easeOutExpo, token);
+      }
+
+      function resetVisualState() {
+        const hub = document.getElementById("hub");
+        hub.classList.remove("is-pulse");
+
+        document.querySelectorAll(".wire").forEach((w) => {
+          w.style.opacity = "0";
+          w.style.strokeDasharray = "";
+          w.style.strokeDashoffset = "";
+        });
+        document.querySelectorAll(".packet").forEach((p) => {
+          p.style.opacity = "0";
+        });
+        document.querySelectorAll(".dock-anchor").forEach((el) => {
+          el.style.opacity = "0";
+        });
+        document.querySelectorAll(".dock-label").forEach((el) => {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(6px)";
+        });
+        document.querySelectorAll(".rx-card").forEach((card) => {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(12px) scale(0.96)";
+          card.querySelectorAll(".rx-live, .rx-value, .rx-cat, .rx-action").forEach((part) => {
+            part.style.opacity = "0";
+            part.style.transform = "translateY(6px)";
+          });
+        });
+        const footer = document.getElementById("rxFooter");
+        footer.style.opacity = "0";
+        footer.style.transform = "translateY(8px)";
+        document.getElementById("footnote").style.opacity = "0";
+      }
+
+      async function softReset(token) {
+        const fadeTargets = [
+          ...document.querySelectorAll(".wire"),
+          ...document.querySelectorAll(".packet"),
+          ...document.querySelectorAll(".rx-card"),
+          ...document.querySelectorAll(".dock-label"),
+          ...document.querySelectorAll(".dock-anchor"),
+          document.getElementById("rxFooter"),
+          document.getElementById("footnote"),
+        ];
+        await Promise.all(
+          fadeTargets.map((el) => tween(el, { opacity: 0 }, 520, 0, easeOutExpo, token))
+        );
+        if (token.cancelled) return;
+        resetVisualState();
+      }
+
+      async function playCycle(token) {
         const brand = document.getElementById("brandBar");
         const plant = document.getElementById("plant");
         const hub = document.getElementById("hub");
@@ -688,16 +880,27 @@
         const dockLabels = [0, 1, 2, 3].map((i) => document.getElementById(`dockLabel${i}`));
         const dockAnchors = [0, 1, 2, 3].map((i) => document.getElementById(`dock${i}`));
         const packets = [...document.querySelectorAll(".packet")];
+        const cards = [...document.querySelectorAll(".rx-card")];
+        const footer = document.getElementById("rxFooter");
 
         layoutWires();
 
         if (reduce) {
-          [brand, plant, hub, hubCaption, footnote, ...colLabels, ...dockLabels, ...dockAnchors].forEach((el) => {
+          [
+            brand, plant, hub, hubCaption, footnote, footer,
+            ...colLabels, ...dockLabels, ...dockAnchors, ...cards,
+          ].forEach((el) => {
             el.style.opacity = "1";
             el.style.transform = "";
           });
           hub.style.transform = "translate(-50%, -50%)";
           colLabels[1].style.transform = "translateX(-50%)";
+          cards.forEach((card) => {
+            card.querySelectorAll(".rx-live, .rx-value, .rx-cat, .rx-action").forEach((part) => {
+              part.style.opacity = "1";
+              part.style.transform = "none";
+            });
+          });
           document.querySelectorAll(".wire").forEach((w) => {
             w.style.opacity = "1";
             w.style.strokeDasharray = "none";
@@ -707,76 +910,99 @@
           return;
         }
 
-        await tween(brand, { opacity: 1, y: 0, startY: 8 }, 560, 40, easeOutExpo);
-        await Promise.all([
-          tween(plant, { opacity: 1, y: 0, startY: 10 }, 640, 0, easeOutExpo),
-          ...colLabels.map((el, i) =>
-            tween(
-              el,
-              {
-                opacity: 1,
-                y: 0,
-                startY: 8,
-                centerX: el.classList.contains("col-label--intel"),
-              },
-              560,
-              40 + i * 50,
-              easeOutExpo
-            )
-          ),
-        ]);
+        const firstCycle = brand.style.opacity === "" || parseFloat(brand.style.opacity || "0") < 0.5;
 
-        await tween(hub, { opacity: 1, hubScale: true }, 620, 40, easeOutExpo);
-        await tween(hubCaption, { opacity: 1, y: 0, startY: 6 }, 420, 0, easeOutExpo);
+        if (firstCycle) {
+          await tween(brand, { opacity: 1, y: 0, startY: 8 }, 560, 40, easeOutExpo, token);
+          await Promise.all([
+            tween(plant, { opacity: 1, y: 0, startY: 10 }, 640, 0, easeOutExpo, token),
+            ...colLabels.map((el, i) =>
+              tween(
+                el,
+                {
+                  opacity: 1,
+                  y: 0,
+                  startY: 8,
+                  centerX: el.classList.contains("col-label--intel"),
+                },
+                560,
+                40 + i * 50,
+                easeOutExpo,
+                token
+              )
+            ),
+          ]);
+          await tween(hub, { opacity: 1, hubScale: true }, 620, 40, easeOutExpo, token);
+          await tween(hubCaption, { opacity: 1, y: 0, startY: 6 }, 420, 0, easeOutExpo, token);
+        }
+
+        if (token.cancelled) return;
         layoutWires();
 
         await Promise.all(
           dockLabels.map((el, i) =>
-            tween(el, { opacity: 1, y: 0, startY: 6 }, 480, i * 55, easeOutExpo)
+            tween(el, { opacity: 1, y: 0, startY: 6 }, 480, i * 55, easeOutExpo, token)
           )
         );
         dockAnchors.forEach((el, i) => {
           setTimeout(() => {
-            if (!cancelled) el.style.opacity = "1";
+            if (!token.cancelled) el.style.opacity = "1";
           }, 80 + i * 55);
         });
 
         const inbound = [0, 1, 2, 3].map((i) => document.getElementById(`path${i}`));
-        await Promise.all(inbound.map((p, i) => drawPath(p, 780, i * 70)));
+        await Promise.all(inbound.map((p, i) => drawPath(p, 780, i * 70, token)));
+        if (token.cancelled) return;
 
         await Promise.all(
           packets.map((packet, i) => {
             const path = document.getElementById(packet.getAttribute("data-path"));
-            return runPacket(packet, path, 1100, i * 90);
+            return runPacket(packet, path, 1100, i * 90, token);
           })
         );
+        if (token.cancelled) return;
 
         hub.classList.add("is-pulse");
-        await sleep(900);
+        await sleep(750, token);
         hub.classList.remove("is-pulse");
+        if (token.cancelled) return;
 
-        await tween(footnote, { opacity: 1, y: 0, startY: 4 }, 420, 0, easeOutExpo);
+        const pathOut = document.getElementById("pathOut");
+        await drawPath(pathOut, 620, 0, token);
+        if (token.cancelled) return;
+
+        for (let i = 0; i < cards.length; i++) {
+          if (token.cancelled) return;
+          await assembleCard(cards[i], token);
+          await sleep(90, token);
+        }
+
+        await tween(footer, { opacity: 1, y: 0, startY: 8 }, 420, 40, easeOutExpo, token);
+        await tween(footnote, { opacity: 1, y: 0, startY: 4 }, 420, 0, easeOutExpo, token);
+
+        await sleep(2800, token);
+        if (token.cancelled) return;
+        await softReset(token);
       }
 
-      function restartInbound() {
-        cancelled = true;
-        cancelAnimationFrame(packetRaf);
-        cancelled = false;
-        document.querySelectorAll(".wire").forEach((w) => {
-          w.style.opacity = "0";
-          w.style.strokeDasharray = "";
-          w.style.strokeDashoffset = "";
-        });
-        document.querySelectorAll(".packet").forEach((p) => {
-          p.style.opacity = "0";
-        });
-        document.querySelectorAll(".dock-anchor, .dock-label").forEach((el) => {
-          el.style.opacity = "0";
-          if (el.classList.contains("dock-label")) el.style.transform = "translateY(6px)";
-        });
-        const hub = document.getElementById("hub");
-        hub.classList.remove("is-pulse");
-        inboundSequence();
+      async function loop() {
+        const token = { cancelled: false, id: ++runId };
+        activeToken = token;
+        while (!token.cancelled && token.id === runId) {
+          await playCycle(token);
+          if (reduce) break;
+          if (token.cancelled || token.id !== runId) break;
+          await sleep(350, token);
+        }
+      }
+
+      function restartLoop() {
+        if (activeToken) activeToken.cancelled = true;
+        runId += 1;
+        clearTimeout(loopTimer);
+        resetVisualState();
+        layoutWires();
+        loopTimer = setTimeout(loop, 80);
       }
 
       let resizeTimer;
@@ -784,14 +1010,16 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
           layoutWires();
-        }, 90);
+          if (!reduce) restartLoop();
+          else layoutWires();
+        }, 120);
       });
 
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(layoutWires);
       }
 
-      inboundSequence();
+      loop();
     })();
   </script>
 </body>
