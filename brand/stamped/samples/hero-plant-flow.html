@@ -70,28 +70,28 @@
       position: absolute;
       left: 3.5%;
       top: 50%;
-      width: min(300px, 26%);
+      width: min(340px, 30%);
       aspect-ratio: 5 / 4;
       transform: translateY(-50%);
       z-index: 1;
       opacity: 0;
-      overflow: hidden;
-      background: #ecece8;
-      border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+      overflow: visible;
+      background: transparent;
+      border: none;
     }
 
     .plant img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      object-position: left center;
       display: block;
-      filter: grayscale(1) contrast(1.05);
     }
 
     .plant-fallback {
       position: absolute;
       inset: 0;
-      display: grid;
+      display: none;
       place-items: center;
       text-align: center;
       padding: 16px;
@@ -99,8 +99,8 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--mute);
-      background:
-        linear-gradient(135deg, #f4f4f1 0%, #e6e6e2 100%);
+      background: #ecece8;
+      border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
     }
 
     .src-label {
@@ -362,16 +362,15 @@
 <body>
   <div class="stage" id="stage">
     <div class="scene" id="scene">
-      <!-- Dummy plant photo: replace assets/plant-placeholder.jpg with final art -->
+      <!-- Plant art: brand/stamped/assets/plant-placeholder.png -->
       <div class="plant" id="plant">
         <div class="plant-fallback" id="plantFallback">Plant photo<br />placeholder</div>
         <img
           id="plantImg"
-          src="../assets/plant-placeholder.jpg"
+          src="../assets/plant-placeholder.png"
           alt=""
-          hidden
-          onload="this.hidden=false; document.getElementById('plantFallback').style.display='none';"
-          onerror="this.remove();"
+          onload="document.getElementById('plantFallback').style.display='none';"
+          onerror="this.remove(); document.getElementById('plantFallback').style.display='grid';"
         />
       </div>
 
