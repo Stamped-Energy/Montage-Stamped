@@ -10,16 +10,16 @@
   <style>
     :root {
       --bg: #fcfcfb;
-      --face: #f7f7f5;
-      --shade: #d8d8d4;
-      --shade-deep: #bdbdb8;
       --ink: #111110;
       --mute: #5c5c59;
       --line: #111110;
-      --panel: #f3f3f1;
       --coral: #F75440;
       --tag-pos: #dfe8d8;
       --tag-pos-ink: #2f3a28;
+      --tag-neg: #f0e4e1;
+      --tag-neg-ink: #6b2e24;
+      --rx-h: 78px;
+      --rx-visible: 2;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,50 +47,73 @@
       background: var(--bg);
     }
 
-    /* —— SVG layer —— */
     .scene-svg {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: 2;
+      pointer-events: none;
     }
 
     .wire {
       fill: none;
       stroke: var(--line);
-      stroke-width: 1.35;
+      stroke-width: 1.4;
       stroke-linecap: round;
       stroke-linejoin: round;
       opacity: 0;
     }
 
-    .wire-dashed {
+    .wire-out {
       fill: none;
       stroke: var(--line);
-      stroke-dasharray: 2 5;
-      stroke-width: 1.15;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      stroke-width: 1.25;
       opacity: 0;
     }
 
-    .dot {
-      fill: var(--ink);
-      opacity: 0;
-    }
-
-    .iso-stroke { stroke: var(--ink); stroke-width: 1.6; fill: none; stroke-linejoin: round; stroke-linecap: round; }
-    .iso-face { fill: var(--face); stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; }
-    .iso-shade { fill: var(--shade); stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; }
-    .iso-deep { fill: var(--shade-deep); stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; }
-    .iso-window { fill: none; stroke: var(--ink); stroke-width: 1.25; }
-
-    .plant-group { opacity: 0; }
     .globe-group { opacity: 0; }
-    .logo-group { opacity: 0; }
+    .iso-stroke { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+    .iso-face { fill: #f7f7f5; stroke: var(--ink); stroke-width: 1.5; }
 
-    /* —— HTML chrome —— */
+    /* Plant photo placeholder — replace src later */
+    .plant {
+      position: absolute;
+      left: 38%;
+      top: 50%;
+      width: min(340px, 32%);
+      aspect-ratio: 5 / 4;
+      transform: translate(-20%, -50%);
+      z-index: 1;
+      opacity: 0;
+      overflow: hidden;
+      background: #ecece8;
+      border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    }
+
+    .plant img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(1) contrast(1.05);
+    }
+
+    .plant-fallback {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 16px;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--mute);
+      background:
+        linear-gradient(135deg, #f4f4f1 0%, #e6e6e2 100%);
+    }
+
     .src-label {
       position: absolute;
       z-index: 4;
@@ -106,30 +129,35 @@
       transform: translateY(6px);
     }
 
-    .signal {
+    /* Traveling signal chips — main motion focus */
+    .signals {
       position: absolute;
+      inset: 0;
       z-index: 5;
+      pointer-events: none;
+    }
+
+    .chip {
+      position: absolute;
+      left: 0;
+      top: 0;
       display: flex;
       align-items: center;
       gap: 6px;
       opacity: 0;
-      transform: translate(-50%, calc(-100% - 10px));
-      pointer-events: none;
+      will-change: transform, opacity;
       white-space: nowrap;
     }
 
-    .signal::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 100%;
-      width: 1px;
-      height: 10px;
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
       background: var(--ink);
-      opacity: 0.55;
+      flex-shrink: 0;
     }
 
-    .signal-name {
+    .chip-name {
       font-size: 9px;
       font-weight: 600;
       letter-spacing: 0.06em;
@@ -139,30 +167,47 @@
       padding: 0 2px;
     }
 
-    .signal-tag {
+    .chip-tag {
       display: inline-flex;
       align-items: center;
       gap: 3px;
       font-size: 9px;
       font-weight: 600;
-      letter-spacing: 0.04em;
       padding: 2px 6px;
       border: 1px solid var(--ink);
       background: var(--bg);
-      color: var(--ink);
     }
 
-    .signal-tag.is-up { background: var(--tag-pos); border-color: color-mix(in srgb, var(--tag-pos-ink) 35%, var(--ink)); color: var(--tag-pos-ink); }
-    .signal-tag.is-down { background: #f0e4e1; border-color: color-mix(in srgb, var(--coral) 40%, var(--ink)); color: #6b2e24; }
+    .chip-tag.is-up {
+      background: var(--tag-pos);
+      border-color: color-mix(in srgb, var(--tag-pos-ink) 35%, var(--ink));
+      color: var(--tag-pos-ink);
+    }
 
-    .arrow {
-      font-size: 8px;
-      line-height: 1;
+    .chip-tag.is-down {
+      background: var(--tag-neg);
+      border-color: color-mix(in srgb, var(--tag-neg-ink) 40%, var(--ink));
+      color: var(--tag-neg-ink);
+    }
+
+    .logo-wrap {
+      position: absolute;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .logo-wrap img {
+      width: 52px;
+      height: 52px;
+      display: block;
     }
 
     .logo-caption {
-      position: absolute;
-      z-index: 4;
       background: var(--ink);
       color: #f7f7f5;
       font-size: 10px;
@@ -170,16 +215,14 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       padding: 5px 9px;
-      opacity: 0;
-      transform: translateY(6px);
     }
 
-    /* Recommendations panel — C-Vector grammar */
+    /* Recommendations: viewport shows 2 slots; track slides up */
     .rx-panel {
       position: absolute;
       top: 7%;
       right: 3.5%;
-      width: min(320px, 30vw);
+      width: min(340px, 32vw);
       z-index: 6;
       opacity: 0;
       transform: translateY(10px);
@@ -203,17 +246,17 @@
     }
 
     .rx-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      border: 1px solid var(--ink);
+      border: 1px solid var(--coral);
+      color: var(--coral);
       padding: 3px 7px;
       opacity: 0;
-      transform: scale(0.96);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .rx-live::before {
@@ -224,33 +267,34 @@
       background: currentColor;
     }
 
-    .rx-live.is-on {
-      border-color: var(--coral);
-      color: var(--coral);
+    .rx-viewport {
+      height: calc(var(--rx-h) * var(--rx-visible));
+      overflow: hidden;
+      position: relative;
     }
 
-    .rx-list {
+    .rx-track {
       display: flex;
       flex-direction: column;
-      gap: 0;
+      will-change: transform;
+      transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .rx-item {
-      padding: 12px 0;
-      border-bottom: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
-      opacity: 0;
-      transform: translateY(10px);
+      height: var(--rx-h);
+      padding: 12px 0 14px;
+      border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 7px;
     }
-
-    .rx-item:last-child { border-bottom: none; }
 
     .rx-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 7px;
-      opacity: 0;
-      transform: translateY(4px);
     }
 
     .rx-tag {
@@ -269,20 +313,13 @@
       color: var(--tag-pos-ink);
     }
 
-    .rx-tag.is-alert {
-      background: var(--bg);
-      color: var(--ink);
-    }
-
     .rx-copy {
       font-family: "Space Grotesk", sans-serif;
       font-size: 14px;
       font-weight: 500;
       letter-spacing: -0.015em;
-      line-height: 1.3;
+      line-height: 1.25;
       color: var(--ink);
-      opacity: 0;
-      transform: translateY(4px);
     }
 
     .footnote {
@@ -300,192 +337,71 @@
     }
 
     @media (max-width: 900px) {
-      .rx-panel { width: min(260px, 36vw); }
+      .plant { width: min(280px, 36%); left: 36%; }
+      .rx-panel { width: min(280px, 38vw); }
       .rx-copy { font-size: 12px; }
-      .src-label { font-size: 8px; padding: 5px 7px; }
-      .signal-name { font-size: 8px; }
+      :root { --rx-h: 72px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .plant-group, .globe-group, .logo-group,
-      .src-label, .signal, .logo-caption, .rx-panel, .rx-live,
-      .rx-item, .rx-tags, .rx-copy, .footnote, .wire, .wire-dashed, .dot {
+      .plant, .globe-group, .src-label, .rx-panel, .rx-live, .logo-wrap, .footnote, .wire, .wire-out {
         opacity: 1 !important;
         transform: none !important;
       }
-      .dot { display: none !important; }
+      .rx-track { transition: none !important; }
+      .chip { opacity: 0.85 !important; }
     }
   </style>
 </head>
 <body>
   <div class="stage" id="stage">
     <div class="scene" id="scene">
+      <!-- Dummy plant photo: replace assets/plant-placeholder.jpg with final art -->
+      <div class="plant" id="plant">
+        <div class="plant-fallback" id="plantFallback">Plant photo<br />placeholder</div>
+        <img
+          id="plantImg"
+          src="../assets/plant-placeholder.jpg"
+          alt=""
+          hidden
+          onload="this.hidden=false; document.getElementById('plantFallback').style.display='none';"
+          onerror="this.remove();"
+        />
+      </div>
+
       <svg class="scene-svg" id="svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <!-- Wires: drawn in JS via path ids -->
         <path class="wire" id="wExt" />
         <path class="wire" id="wTel" />
         <path class="wire" id="wApp" />
-        <path class="wire" id="wOut" />
-        <path class="wire-dashed" id="wRxLink" />
+        <path class="wire-out" id="wOut" />
 
-        <circle class="dot" id="d0" r="3.2" />
-        <circle class="dot" id="d1" r="3.2" />
-        <circle class="dot" id="d2" r="3.2" />
-        <circle class="dot" id="d3" r="3.2" />
-        <circle class="dot" id="d4" r="3.2" />
-        <circle class="dot" id="d5" r="3.2" />
-        <circle class="dot" id="d6" r="3.2" />
-        <circle class="dot" id="dOut" r="3.2" />
-
-        <!-- Globe (external signals origin) -->
-        <g class="globe-group" id="globe" transform="translate(78,168)">
-          <circle cx="0" cy="0" r="28" class="iso-face" />
-          <ellipse cx="0" cy="0" rx="12" ry="28" class="iso-stroke" />
-          <path d="M-28 0 H28" class="iso-stroke" />
-          <path d="M-24 -14 C-8 -18 8 -18 24 -14" class="iso-stroke" />
-          <path d="M-24 14 C-8 18 8 18 24 14" class="iso-stroke" />
-          <path d="M-6 -26 C2 -8 2 8 -6 26" class="iso-stroke" opacity="0.7" />
-          <path d="M6 -26 C-2 -8 -2 8 6 26" class="iso-stroke" opacity="0.7" />
-        </g>
-
-        <!-- Isometric plant (center) — approx iso 30° -->
-        <g class="plant-group" id="plant" transform="translate(520, 250)">
-          <!-- Ground hint -->
-          <path d="M-40 210 L160 280 L360 180 L160 110 Z" fill="none" stroke="var(--ink)" stroke-width="0.8" opacity="0.12" />
-
-          <!-- Left warehouse -->
-          <g transform="translate(0,40)">
-            <!-- roof left -->
-            <path class="iso-shade" d="M0 40 L90 0 L180 40 L90 80 Z" />
-            <!-- left wall -->
-            <path class="iso-deep" d="M0 40 L90 80 L90 160 L0 120 Z" />
-            <!-- front wall -->
-            <path class="iso-face" d="M90 80 L180 40 L180 120 L90 160 Z" />
-            <!-- windows front -->
-            <rect class="iso-window" x="112" y="70" width="14" height="10" transform="skewY(-16)" />
-            <rect class="iso-window" x="136" y="62" width="14" height="10" transform="skewY(-16)" />
-            <rect class="iso-window" x="112" y="96" width="14" height="10" transform="skewY(-16)" />
-            <rect class="iso-window" x="136" y="88" width="14" height="10" transform="skewY(-16)" />
-            <!-- door -->
-            <path class="iso-window" d="M128 128 L148 118 L148 148 L128 158 Z" />
-          </g>
-
-          <!-- Mid tower + silo -->
-          <g transform="translate(150,10)">
-            <path class="iso-shade" d="M0 50 L70 -10 L140 50 L70 110 Z" />
-            <path class="iso-deep" d="M0 50 L70 110 L70 220 L0 160 Z" />
-            <path class="iso-face" d="M70 110 L140 50 L140 160 L70 220 Z" />
-            <!-- floors -->
-            <path d="M8 90 L70 132 L132 90" class="iso-stroke" opacity="0.45" />
-            <path d="M8 120 L70 162 L132 120" class="iso-stroke" opacity="0.45" />
-            <path d="M8 150 L70 192 L132 150" class="iso-stroke" opacity="0.45" />
-            <!-- silo -->
-            <ellipse class="iso-shade" cx="155" cy="70" rx="28" ry="12" />
-            <path class="iso-face" d="M127 70 V150" />
-            <path class="iso-deep" d="M183 70 V150" />
-            <rect class="iso-face" x="127" y="70" width="56" height="80" />
-            <ellipse class="iso-shade" cx="155" cy="150" rx="28" ry="12" />
-            <ellipse class="iso-stroke" cx="155" cy="70" rx="28" ry="12" />
-            <!-- pipe to warehouse -->
-            <path class="iso-stroke" d="M-20 130 H40" />
-            <path class="iso-stroke" d="M40 130 V100" />
-          </g>
-
-          <!-- Right building + stacks -->
-          <g transform="translate(300,-10)">
-            <path class="iso-shade" d="M0 60 L80 10 L160 60 L80 110 Z" />
-            <path class="iso-deep" d="M0 60 L80 110 L80 200 L0 150 Z" />
-            <path class="iso-face" d="M80 110 L160 60 L160 150 L80 200 Z" />
-            <rect class="iso-window" x="100" y="90" width="12" height="9" />
-            <rect class="iso-window" x="118" y="82" width="12" height="9" />
-            <rect class="iso-window" x="100" y="112" width="12" height="9" />
-            <rect class="iso-window" x="118" y="104" width="12" height="9" />
-            <!-- stacks -->
-            <path class="iso-deep" d="M40 10 L52 2 L52 70 L40 78 Z" />
-            <path class="iso-face" d="M52 2 L64 10 L64 78 L52 70 Z" />
-            <path class="iso-shade" d="M40 10 L52 2 L64 10 L52 18 Z" />
-            <path class="iso-deep" d="M72 0 L84 -8 L84 62 L72 70 Z" />
-            <path class="iso-face" d="M84 -8 L96 0 L96 70 L84 62 Z" />
-            <path class="iso-shade" d="M72 0 L84 -8 L96 0 L84 8 Z" />
-            <!-- smoke puffs -->
-            <path d="M46 -6 C48 -14 56 -14 54 -4" class="iso-stroke" opacity="0.45" />
-            <path d="M78 -16 C80 -24 88 -24 86 -12" class="iso-stroke" opacity="0.45" />
-            <!-- connector -->
-            <path class="iso-stroke" d="M-30 140 H20" opacity="0.7" />
-          </g>
-        </g>
-
-        <!-- Stamped mark stand-in (isometric seal) near plant exit -->
-        <g class="logo-group" id="logoMark" transform="translate(980, 520)">
-          <image href="../assets/logo-mark.png" x="-28" y="-28" width="56" height="56" />
+        <g class="globe-group" id="globe" transform="translate(90,175)">
+          <circle cx="0" cy="0" r="26" class="iso-face" />
+          <ellipse cx="0" cy="0" rx="11" ry="26" class="iso-stroke" />
+          <path d="M-26 0 H26" class="iso-stroke" />
+          <path d="M-22 -13 C-7 -17 7 -17 22 -13" class="iso-stroke" />
+          <path d="M-22 13 C-7 17 7 17 22 13" class="iso-stroke" />
         </g>
       </svg>
 
-      <!-- Source labels -->
-      <div class="src-label" id="srcExt" style="left: 4.5%; top: 14%;">External signals</div>
-      <div class="src-label" id="srcTel" style="left: 4.5%; top: 42%;">Plant telemetry</div>
-      <div class="src-label" id="srcApp" style="left: 4.5%; top: 68%;">Application data</div>
+      <div class="src-label" id="srcExt" style="left: 4.2%; top: 13%;">External signals</div>
+      <div class="src-label" id="srcTel" style="left: 4.2%; top: 41%;">Plant telemetry</div>
+      <div class="src-label" id="srcApp" style="left: 4.2%; top: 67%;">Application data</div>
 
-      <!-- Signal callouts (positioned by JS along paths) -->
-      <div class="signal" id="sig0" data-path="wExt" data-t="0.28">
-        <span class="signal-name">TOU tariff</span>
-        <span class="signal-tag is-up"><span class="arrow">↑</span> 6%</span>
-      </div>
-      <div class="signal" id="sig1" data-path="wExt" data-t="0.48">
-        <span class="signal-name">Peak window</span>
-        <span class="signal-tag is-down"><span class="arrow">↓</span> 3%</span>
-      </div>
-      <div class="signal" id="sig2" data-path="wExt" data-t="0.68">
-        <span class="signal-name">Feedstock</span>
-        <span class="signal-tag is-up"><span class="arrow">↑</span> 8%</span>
-      </div>
-      <div class="signal" id="sig3" data-path="wTel" data-t="0.45">
-        <span class="signal-name">Power draw</span>
-        <span class="signal-tag is-up"><span class="arrow">↑</span> 8%</span>
-      </div>
-      <div class="signal" id="sig4" data-path="wTel" data-t="0.72">
-        <span class="signal-name">Incomer MD</span>
-        <span class="signal-tag is-up"><span class="arrow">↑</span> 4%</span>
-      </div>
-      <div class="signal" id="sig5" data-path="wApp" data-t="0.42">
-        <span class="signal-name">Demand forecast</span>
-        <span class="signal-tag is-up"><span class="arrow">↑</span> 5%</span>
-      </div>
-      <div class="signal" id="sig6" data-path="wApp" data-t="0.70">
-        <span class="signal-name">Shift plan</span>
-        <span class="signal-tag is-up"><span class="arrow">↑</span> 2%</span>
+      <div class="signals" id="signals" aria-hidden="true"></div>
+
+      <div class="logo-wrap" id="logoWrap" style="left: 72%; top: 68%;">
+        <img src="../assets/logo-mark.png" width="52" height="52" alt="" />
+        <div class="logo-caption">Stamped</div>
       </div>
 
-      <div class="logo-caption" id="logoCaption" style="left: 74%; top: 78%;">Stamped</div>
-
-      <!-- Recommendations -->
       <aside class="rx-panel" id="rxPanel" aria-label="Recommendations">
         <div class="rx-head">
           <div class="rx-title">Recommendations</div>
           <div class="rx-live" id="rxLive">Live</div>
         </div>
-        <div class="rx-list">
-          <article class="rx-item" data-rx="0">
-            <div class="rx-tags">
-              <span class="rx-tag is-money">+ ₹2.4M</span>
-              <span class="rx-tag is-alert">Annual</span>
-            </div>
-            <p class="rx-copy">Optimize Shift 2 planning before peak reset</p>
-          </article>
-          <article class="rx-item" data-rx="1">
-            <div class="rx-tags">
-              <span class="rx-tag is-money">+ ₹165K</span>
-              <span class="rx-tag is-alert">Avoid scrap</span>
-            </div>
-            <p class="rx-copy">Correct setpoint for feedstock drift</p>
-          </article>
-          <article class="rx-item" data-rx="2">
-            <div class="rx-tags">
-              <span class="rx-tag is-money">+ ₹980K</span>
-              <span class="rx-tag is-alert">Demand</span>
-            </div>
-            <p class="rx-copy">Stagger high-load assets to cut MD</p>
-          </article>
+        <div class="rx-viewport" id="rxViewport">
+          <div class="rx-track" id="rxTrack"></div>
         </div>
       </aside>
 
@@ -498,53 +414,60 @@
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
-      let runId = 0;
-      let activeToken = null;
+      /* Signal chips that travel the wires forever after open */
+      const CHIP_DEFS = [
+        { path: "wExt", name: "TOU tariff", tag: "↑ 6%", dir: "up", phase: 0.05, speed: 0.000095 },
+        { path: "wExt", name: "Peak window", tag: "↓ 3%", dir: "down", phase: 0.38, speed: 0.000088 },
+        { path: "wExt", name: "Feedstock", tag: "↑ 8%", dir: "up", phase: 0.72, speed: 0.0001 },
+        { path: "wTel", name: "Power draw", tag: "↑ 8%", dir: "up", phase: 0.12, speed: 0.00011 },
+        { path: "wTel", name: "Incomer MD", tag: "↑ 4%", dir: "up", phase: 0.55, speed: 0.000092 },
+        { path: "wApp", name: "Demand forecast", tag: "↑ 5%", dir: "up", phase: 0.18, speed: 0.000098 },
+        { path: "wApp", name: "Shift plan", tag: "↑ 2%", dir: "up", phase: 0.62, speed: 0.000105 },
+      ];
 
-      /* Fixed layout in viewBox coords (1280×720) — matches C-Vector composition */
+      /* 9 recommendations — only 2 visible; carousel after open */
+      const RX_ITEMS = [
+        { money: "+ ₹2.4M", label: "Annual", copy: "Optimize Shift 2 planning before peak reset" },
+        { money: "+ ₹165K", label: "Avoid scrap", copy: "Correct setpoint for feedstock drift" },
+        { money: "+ ₹980K", label: "Demand", copy: "Stagger high-load assets to cut MD" },
+        { money: "+ ₹420K", label: "Idle waste", copy: "Shed idle HVAC during changeover" },
+        { money: "+ ₹310K", label: "TOU", copy: "Pull forward batch into off-peak window" },
+        { money: "+ ₹185K", label: "PF", copy: "Correct lagging bank on feeder 3" },
+        { money: "+ ₹740K", label: "Baseline", copy: "Retune dryer SEC after feedstock change" },
+        { money: "+ ₹95K", label: "Leak", copy: "Inspect compressed-air branch on Line B" },
+        { money: "+ ₹560K", label: "Schedule", copy: "Avoid MD spike at shift overlap" },
+      ];
+
       const LAYOUT = {
-        globe: { x: 78, y: 168 },
-        extJoin: { x: 210, y: 210 },
-        telStart: { x: 120, y: 340 },
-        appStart: { x: 120, y: 500 },
-        plantIn: { x: 500, y: 340 },
-        plantOut: { x: 860, y: 420 },
+        globe: { x: 90, y: 175 },
+        plantIn: { x: 560, y: 350 },
+        plantOut: { x: 780, y: 420 },
         logo: { x: 980, y: 520 },
-        rxAnchor: { x: 1100, y: 220 },
       };
 
-      function sleep(ms, token) {
-        return new Promise((resolve) => {
-          const id = setTimeout(() => resolve(!token.cancelled), ms);
-          if (token.cancelled) {
-            clearTimeout(id);
-            resolve(false);
-          }
-        });
+      let chipRaf = 0;
+      let chipsStarted = false;
+      let carouselTimer = 0;
+      let rxIndex = 0;
+
+      function sleep(ms) {
+        return new Promise((r) => setTimeout(r, ms));
       }
 
-      function tweenStyle(el, to, duration, delay, token, fromTransform) {
+      function tween(el, props, duration, delay = 0) {
         return new Promise((resolve) => {
-          if (token.cancelled) return resolve();
           const start = performance.now() + delay;
           const fromOp = parseFloat(getComputedStyle(el).opacity) || 0;
-          const startY = fromTransform && fromTransform.y != null ? fromTransform.y : 8;
-          const mode = (fromTransform && fromTransform.mode) || "y";
-
+          const startY = props.startY != null ? props.startY : 8;
           (function frame(now) {
-            if (token.cancelled) return resolve();
             if (now < start) return requestAnimationFrame(frame);
             const t = Math.min(1, (now - start) / duration);
             const e = easeOutExpo(t);
-            if ("opacity" in to) el.style.opacity = String(fromOp + (to.opacity - fromOp) * e);
-            if (mode === "signal") {
-              /* anchored above path point */
-              el.style.transform = `translate(-50%, calc(-100% - ${10 - 10 * e}px))`;
-            } else if (mode === "scale" || to.scale) {
-              const s = 0.96 + 0.04 * e;
-              el.style.transform = `scale(${s})`;
-            } else if (to.y != null || fromTransform) {
-              const y = startY + ((to.y != null ? to.y : 0) - startY) * e;
+            if ("opacity" in props) {
+              el.style.opacity = String(fromOp + (props.opacity - fromOp) * e);
+            }
+            if (props.y != null || props.startY != null) {
+              const y = startY + ((props.y != null ? props.y : 0) - startY) * e;
               el.style.transform = `translateY(${y}px)`;
             }
             if (t < 1) requestAnimationFrame(frame);
@@ -553,17 +476,14 @@
         });
       }
 
-      function tweenSvgOpacity(el, to, duration, delay, token) {
+      function tweenSvg(el, toOp, duration, delay = 0) {
         return new Promise((resolve) => {
-          if (token.cancelled) return resolve();
           const start = performance.now() + delay;
-          const from = parseFloat(el.style.opacity || el.getAttribute("opacity") || "0") || 0;
+          const from = parseFloat(el.style.opacity || "0") || 0;
           (function frame(now) {
-            if (token.cancelled) return resolve();
             if (now < start) return requestAnimationFrame(frame);
             const t = Math.min(1, (now - start) / duration);
-            const e = easeOutExpo(t);
-            el.style.opacity = String(from + (to - from) * e);
+            el.style.opacity = String(from + (toOp - from) * easeOutExpo(t));
             if (t < 1) requestAnimationFrame(frame);
             else resolve();
           })(performance.now());
@@ -572,29 +492,47 @@
 
       function layoutPaths() {
         const L = LAYOUT;
-        /* External: globe → diagonal trunk into plant */
+        const plant = document.getElementById("plant");
+        const svg = document.getElementById("svg");
+
+        /* Aim wires at plant edges in viewBox space */
+        const pr = plant.getBoundingClientRect();
+        const ctm = svg.getScreenCTM();
+        if (ctm) {
+          const inv = ctm.inverse();
+          const pt = svg.createSVGPoint();
+          pt.x = pr.left + 4;
+          pt.y = pr.top + pr.height * 0.42;
+          const sp = pt.matrixTransform(inv);
+          L.plantIn = { x: sp.x, y: sp.y };
+
+          pt.x = pr.right - 8;
+          pt.y = pr.top + pr.height * 0.62;
+          const out = pt.matrixTransform(inv);
+          L.plantOut = { x: out.x, y: out.y };
+        }
+
         document.getElementById("wExt").setAttribute(
           "d",
-          `M ${L.globe.x + 28} ${L.globe.y + 8} L ${L.extJoin.x} ${L.extJoin.y} L ${L.plantIn.x} ${L.plantIn.y - 40}`
+          `M ${L.globe.x + 26} ${L.globe.y + 6} L 240 220 L ${L.plantIn.x} ${L.plantIn.y - 36}`
         );
         document.getElementById("wTel").setAttribute(
           "d",
-          `M ${L.telStart.x} ${L.telStart.y} L ${L.plantIn.x - 40} ${L.plantIn.y} L ${L.plantIn.x} ${L.plantIn.y}`
+          `M 130 340 L 320 340 L ${L.plantIn.x} ${L.plantIn.y}`
         );
         document.getElementById("wApp").setAttribute(
           "d",
-          `M ${L.appStart.x} ${L.appStart.y} L ${L.plantIn.x - 60} ${L.plantIn.y + 50} L ${L.plantIn.x} ${L.plantIn.y + 20}`
+          `M 130 500 L 300 470 L ${L.plantIn.x} ${L.plantIn.y + 40}`
         );
         document.getElementById("wOut").setAttribute(
           "d",
-          `M ${L.plantOut.x} ${L.plantOut.y} L ${L.logo.x - 36} ${L.logo.y - 8}`
-        );
-        document.getElementById("wRxLink").setAttribute(
-          "d",
-          `M ${L.rxAnchor.x} ${L.rxAnchor.y} L ${L.rxAnchor.x} ${L.logo.y - 40} L ${L.logo.x} ${L.logo.y - 36}`
+          `M ${L.plantOut.x} ${L.plantOut.y} L ${L.logo.x - 40} ${L.logo.y - 10}`
         );
 
-        positionSignals();
+        const logoWrap = document.getElementById("logoWrap");
+        const logoScreen = svgToScreen(L.logo.x, L.logo.y);
+        logoWrap.style.left = `${logoScreen.x - 26}px`;
+        logoWrap.style.top = `${logoScreen.y - 26}px`;
       }
 
       function svgToScreen(x, y) {
@@ -610,34 +548,14 @@
         return { x: sp.x - rect.left, y: sp.y - rect.top };
       }
 
-      function positionSignals() {
-        document.querySelectorAll(".signal").forEach((el) => {
-          const path = document.getElementById(el.dataset.path);
-          if (!path || !path.getAttribute("d")) return;
-          const t = parseFloat(el.dataset.t) || 0.5;
-          const len = path.getTotalLength();
-          const pt = path.getPointAtLength(len * t);
-          const screen = svgToScreen(pt.x, pt.y);
-          el.style.left = `${screen.x}px`;
-          el.style.top = `${screen.y}px`;
-        });
-
-        const logoCap = document.getElementById("logoCaption");
-        const logoScreen = svgToScreen(LAYOUT.logo.x, LAYOUT.logo.y + 40);
-        logoCap.style.left = `${logoScreen.x - 36}px`;
-        logoCap.style.top = `${logoScreen.y}px`;
-      }
-
-      function drawWire(path, duration, delay, token) {
+      function drawWire(path, duration, delay = 0) {
         return new Promise((resolve) => {
-          if (token.cancelled) return resolve();
           const len = path.getTotalLength();
           path.style.strokeDasharray = String(len);
           path.style.strokeDashoffset = String(len);
           path.style.opacity = "1";
           const start = performance.now() + delay;
           (function frame(now) {
-            if (token.cancelled) return resolve();
             if (now < start) return requestAnimationFrame(frame);
             const t = Math.min(1, (now - start) / duration);
             path.style.strokeDashoffset = String(len * (1 - easeOutExpo(t)));
@@ -647,209 +565,170 @@
         });
       }
 
-      function travelDot(dot, path, duration, delay, token) {
-        return new Promise((resolve) => {
-          if (token.cancelled) return resolve();
-          const len = path.getTotalLength();
-          const start = performance.now() + delay;
-          (function frame(now) {
-            if (token.cancelled) return resolve();
-            if (now < start) return requestAnimationFrame(frame);
-            const t = Math.min(1, (now - start) / duration);
-            const e = easeOutExpo(t);
-            const pt = path.getPointAtLength(e * len);
-            dot.setAttribute("cx", pt.x);
-            dot.setAttribute("cy", pt.y);
-            dot.style.opacity = String(t < 0.06 ? t / 0.06 : t > 0.94 ? (1 - t) / 0.06 : 1);
-            if (t < 1) requestAnimationFrame(frame);
-            else {
-              dot.style.opacity = "0";
-              resolve();
-            }
-          })(performance.now());
+      function buildChips() {
+        const root = document.getElementById("signals");
+        root.innerHTML = "";
+        CHIP_DEFS.forEach((def, i) => {
+          const el = document.createElement("div");
+          el.className = "chip";
+          el.dataset.path = def.path;
+          el.dataset.phase = String(def.phase);
+          el.dataset.speed = String(def.speed);
+          el.innerHTML =
+            `<span class="chip-dot"></span>` +
+            `<span class="chip-name">${def.name}</span>` +
+            `<span class="chip-tag ${def.dir === "up" ? "is-up" : "is-down"}">${def.tag}</span>`;
+          root.appendChild(el);
         });
       }
 
-      function resetMotionBits() {
-        document.querySelectorAll(".wire, .wire-dashed").forEach((w) => {
-          w.style.opacity = "0";
-          w.style.strokeDasharray = "";
-          w.style.strokeDashoffset = "";
-        });
-        document.querySelectorAll(".dot").forEach((d) => {
-          d.style.opacity = "0";
-        });
-        document.querySelectorAll(".signal").forEach((s) => {
-          s.style.opacity = "0";
-        });
-        document.querySelectorAll(".rx-item, .rx-tags, .rx-copy").forEach((el) => {
-          el.style.opacity = "0";
-          el.style.transform = "translateY(8px)";
-        });
-        const live = document.getElementById("rxLive");
-        live.style.opacity = "0";
-        live.classList.remove("is-on");
-        document.getElementById("rxPanel").style.opacity = "0";
-        document.getElementById("footnote").style.opacity = "0";
+      function buildRx() {
+        const track = document.getElementById("rxTrack");
+        /* Duplicate first VISIBLE items at end for seamless loop feel */
+        const visible = 2;
+        const list = [...RX_ITEMS, ...RX_ITEMS.slice(0, visible)];
+        track.innerHTML = list
+          .map(
+            (item) =>
+              `<article class="rx-item">` +
+              `<div class="rx-tags">` +
+              `<span class="rx-tag is-money">${item.money}</span>` +
+              `<span class="rx-tag">${item.label}</span>` +
+              `</div>` +
+              `<p class="rx-copy">${item.copy}</p>` +
+              `</article>`
+          )
+          .join("");
+        track.style.transform = "translateY(0)";
+        rxIndex = 0;
       }
 
-      async function assembleRx(token) {
-        const panel = document.getElementById("rxPanel");
-        const live = document.getElementById("rxLive");
-        await tweenStyle(panel, { opacity: 1, y: 0 }, 520, 0, token, { y: 10 });
-        await tweenStyle(live, { opacity: 1 }, 280, 40, token, { mode: "scale" });
-        live.classList.add("is-on");
+      function startChipLoop() {
+        if (chipsStarted || reduce) return;
+        chipsStarted = true;
+        const chips = [...document.querySelectorAll(".chip")];
+        const pathCache = {};
+        chips.forEach((c) => {
+          const id = c.dataset.path;
+          if (!pathCache[id]) pathCache[id] = document.getElementById(id);
+          c.style.opacity = "1";
+        });
 
-        const items = [...document.querySelectorAll(".rx-item")];
-        for (let i = 0; i < items.length; i++) {
-          if (token.cancelled) return;
-          const item = items[i];
-          await tweenStyle(item, { opacity: 1, y: 0 }, 420, 0, token, { y: 10 });
-          const tags = item.querySelector(".rx-tags");
-          const copy = item.querySelector(".rx-copy");
-          await tweenStyle(tags, { opacity: 1, y: 0 }, 280, 0, token, { y: 4 });
-          await tweenStyle(copy, { opacity: 1, y: 0 }, 320, 20, token, { y: 4 });
-          await sleep(70, token);
+        let last = performance.now();
+        (function tick(now) {
+          const dt = Math.min(40, now - last);
+          last = now;
+          chips.forEach((chip) => {
+            const path = pathCache[chip.dataset.path];
+            if (!path || !path.getAttribute("d")) return;
+            const speed = parseFloat(chip.dataset.speed) || 0.0001;
+            let phase = parseFloat(chip.dataset.phase) || 0;
+            phase = (phase + dt * speed) % 1;
+            chip.dataset.phase = String(phase);
+            const len = path.getTotalLength();
+            const pt = path.getPointAtLength(phase * len);
+            const screen = svgToScreen(pt.x, pt.y);
+            /* Fade near ends so chips don't pile on plant / origin */
+            const edge = phase < 0.04 ? phase / 0.04 : phase > 0.92 ? (1 - phase) / 0.08 : 1;
+            chip.style.opacity = String(0.15 + 0.85 * edge);
+            chip.style.transform = `translate(${screen.x}px, ${screen.y}px) translate(-12px, -50%)`;
+          });
+          chipRaf = requestAnimationFrame(tick);
+        })(performance.now());
+      }
+
+      function stepCarousel() {
+        const track = document.getElementById("rxTrack");
+        const itemH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--rx-h")) || 78;
+        rxIndex += 1;
+        track.style.transform = `translateY(${-rxIndex * itemH}px)`;
+
+        /* When we reach the duplicated tail, snap back without animation */
+        if (rxIndex >= RX_ITEMS.length) {
+          setTimeout(() => {
+            track.style.transition = "none";
+            rxIndex = 0;
+            track.style.transform = "translateY(0)";
+            void track.offsetHeight;
+            track.style.transition = "";
+          }, 560);
         }
       }
 
-      async function playCycle(token) {
+      function startCarousel() {
+        if (reduce) return;
+        clearInterval(carouselTimer);
+        carouselTimer = setInterval(stepCarousel, 2200);
+      }
+
+      async function openSequence() {
         layoutPaths();
+        buildChips();
+        buildRx();
 
         const plant = document.getElementById("plant");
         const globe = document.getElementById("globe");
-        const logo = document.getElementById("logoMark");
         const srcs = [
           document.getElementById("srcExt"),
           document.getElementById("srcTel"),
           document.getElementById("srcApp"),
         ];
-        const logoCap = document.getElementById("logoCaption");
+        const logo = document.getElementById("logoWrap");
+        const panel = document.getElementById("rxPanel");
+        const live = document.getElementById("rxLive");
         const footnote = document.getElementById("footnote");
-
-        if (reduce) {
-          [plant, globe, logo].forEach((el) => { el.style.opacity = "1"; });
-          [...srcs, logoCap, footnote, document.getElementById("rxPanel")].forEach((el) => {
-            el.style.opacity = "1";
-            el.style.transform = "none";
-          });
-          document.querySelectorAll(".signal, .rx-item, .rx-tags, .rx-copy, .rx-live, .wire, .wire-dashed").forEach((el) => {
-            el.style.opacity = "1";
-            el.style.transform = "none";
-          });
-          document.getElementById("rxLive").classList.add("is-on");
-          document.querySelectorAll(".wire, .wire-dashed").forEach((w) => {
-            w.style.strokeDasharray = "none";
-            w.style.strokeDashoffset = "0";
-          });
-          positionSignals();
-          return;
-        }
-
-        /* 1. Stage */
-        await Promise.all([
-          tweenSvgOpacity(plant, 1, 700, 0, token),
-          tweenSvgOpacity(globe, 1, 600, 80, token),
-        ]);
-        if (token.cancelled) return;
-
-        await Promise.all(
-          srcs.map((el, i) => tweenStyle(el, { opacity: 1, y: 0 }, 420, i * 70, token, { y: 6 }))
-        );
-
-        /* 2. Draw inbound wires */
         const wExt = document.getElementById("wExt");
         const wTel = document.getElementById("wTel");
         const wApp = document.getElementById("wApp");
-        await Promise.all([
-          drawWire(wExt, 900, 0, token),
-          drawWire(wTel, 900, 120, token),
-          drawWire(wApp, 900, 220, token),
-        ]);
-        if (token.cancelled) return;
-
-        /* 3. Signal labels appear along paths + dots travel */
-        const signals = [...document.querySelectorAll(".signal")];
-        positionSignals();
-        await Promise.all(
-          signals.map((el, i) =>
-            tweenStyle(el, { opacity: 1 }, 380, i * 55, token, { mode: "signal" })
-          )
-        );
-
-        const trips = [
-          ["d0", "wExt", 0],
-          ["d1", "wExt", 180],
-          ["d2", "wExt", 360],
-          ["d3", "wTel", 80],
-          ["d4", "wTel", 280],
-          ["d5", "wApp", 140],
-          ["d6", "wApp", 320],
-        ];
-        await Promise.all(
-          trips.map(([dotId, pathId, delay]) =>
-            travelDot(document.getElementById(dotId), document.getElementById(pathId), 1200, delay, token)
-          )
-        );
-        if (token.cancelled) return;
-
-        /* 4. Out to Stamped */
-        await tweenSvgOpacity(logo, 1, 480, 0, token);
-        await tweenStyle(logoCap, { opacity: 1, y: 0 }, 360, 40, token, { y: 6 });
         const wOut = document.getElementById("wOut");
-        await drawWire(wOut, 700, 0, token);
-        await travelDot(document.getElementById("dOut"), wOut, 900, 40, token);
-        if (token.cancelled) return;
 
-        /* 5. Recommendations */
-        const wRx = document.getElementById("wRxLink");
-        wRx.style.opacity = "1";
-        await drawWire(wRx, 500, 0, token);
-        await assembleRx(token);
-        await tweenStyle(footnote, { opacity: 1, y: 0 }, 360, 0, token, { y: 4 });
-
-        /* Hold */
-        await sleep(3200, token);
-        if (token.cancelled) return;
-
-        /* Soft reset of motion layers (keep plant/globe) */
-        const fadeEls = [
-          ...signals,
-          ...document.querySelectorAll(".rx-item"),
-          document.getElementById("rxPanel"),
-          footnote,
-          logoCap,
-        ];
-        await Promise.all([
-          ...fadeEls.map((el) => tweenStyle(el, { opacity: 0 }, 480, 0, token, { y: 0 })),
-          tweenSvgOpacity(logo, 0, 480, 0, token),
-          ...[wExt, wTel, wApp, wOut, wRx].map((w) => tweenSvgOpacity(w, 0, 480, 0, token)),
-        ]);
-        if (token.cancelled) return;
-        resetMotionBits();
-        srcs.forEach((el) => {
-          el.style.opacity = "0";
-          el.style.transform = "translateY(6px)";
-        });
-      }
-
-      async function loop() {
-        const token = { cancelled: false, id: ++runId };
-        activeToken = token;
-        while (!token.cancelled && token.id === runId) {
-          await playCycle(token);
-          if (reduce) break;
-          if (token.cancelled || token.id !== runId) break;
-          await sleep(400, token);
+        if (reduce) {
+          [plant, globe, logo, panel, live, footnote, ...srcs].forEach((el) => {
+            el.style.opacity = "1";
+            el.style.transform = "none";
+          });
+          [wExt, wTel, wApp, wOut].forEach((w) => {
+            w.style.opacity = "1";
+            w.style.strokeDasharray = "none";
+            w.style.strokeDashoffset = "0";
+          });
+          document.querySelectorAll(".chip").forEach((c, i) => {
+            const path = document.getElementById(CHIP_DEFS[i].path);
+            const pt = path.getPointAtLength(path.getTotalLength() * CHIP_DEFS[i].phase);
+            const screen = svgToScreen(pt.x, pt.y);
+            c.style.opacity = "1";
+            c.style.transform = `translate(${screen.x}px, ${screen.y}px) translate(-12px, -50%)`;
+          });
+          return;
         }
-      }
 
-      function restart() {
-        if (activeToken) activeToken.cancelled = true;
-        runId += 1;
-        resetMotionBits();
+        /* Opening: plant + sources + wires once */
+        await Promise.all([
+          tween(plant, { opacity: 1, y: 0, startY: 10 }, 650, 0),
+          tweenSvg(globe, 1, 550, 60),
+        ]);
         layoutPaths();
-        setTimeout(loop, 60);
+
+        await Promise.all(srcs.map((el, i) => tween(el, { opacity: 1, y: 0, startY: 6 }, 420, i * 70)));
+
+        await Promise.all([
+          drawWire(wExt, 880, 0),
+          drawWire(wTel, 880, 100),
+          drawWire(wApp, 880, 200),
+        ]);
+
+        /* Chips start traveling and keep going for the whole session */
+        startChipLoop();
+
+        await tween(logo, { opacity: 1, y: 0, startY: 8 }, 480, 80);
+        await drawWire(wOut, 620, 0);
+
+        await tween(panel, { opacity: 1, y: 0, startY: 10 }, 520, 40);
+        await tween(live, { opacity: 1 }, 280, 40);
+        await tween(footnote, { opacity: 1 }, 360, 0);
+
+        /* Steady state: recommendations carousel only */
+        startCarousel();
       }
 
       let resizeTimer;
@@ -857,18 +736,17 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
           layoutPaths();
-          if (!reduce) restart();
-        }, 140);
+        }, 100);
       });
 
-      layoutPaths();
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => {
           layoutPaths();
-          loop();
+          openSequence();
         });
       } else {
-        loop();
+        layoutPaths();
+        openSequence();
       }
     })();
   </script>
