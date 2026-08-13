@@ -242,24 +242,27 @@
       background: #4a2c28;
     }
 
-    /* Logo — Frame 10 center ~62.5%, ~10% width */
+    /* Logo — Frame 10; image center sits on wire hub; STAMPED stays below */
     .logo-wrap {
       position: absolute;
       z-index: 4;
       left: 62.5%;
-      top: 50%;
+      /* Vertical hub ≈ mid of inbound wire ends */
+      top: 52.5%;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
       opacity: 0;
-      transform: translate(-50%, -50%) translateY(8px);
+      transform: translateX(-50%) translateY(8px);
     }
 
     .logo-wrap img {
       width: min(128px, 10vw);
       height: min(128px, 10vw);
       display: block;
+      /* Center the mark on .logo-wrap top (hub), caption hangs below */
+      transform: translateY(-50%);
     }
 
     .logo-caption {
@@ -418,7 +421,7 @@
       .plant, .src-label, .dock-dot, .rx-panel, .rx-live, .logo-wrap, .footnote, .wire {
         opacity: 1 !important;
       }
-      .logo-wrap { transform: translate(-50%, -50%) !important; }
+      .logo-wrap { transform: translateX(-50%) !important; }
       .rx-panel { transform: translateY(-50%) !important; }
       .src-label { transform: translate(-50%, calc(-100% - 12px)) !important; }
       .rx-track { transition: none !important; }
@@ -490,10 +493,11 @@
         Out connector: live horizontal from logo mark right → recs left.
       */
       const FRAME10_PATHS = {
-        wExt: "M 676.5 334 V 271 L 1447.5 592",
-        wTel: "M 892.5 690 L 935.5 662 H 1454.5",
-        wApp: "M 466.5 1000 L 782.5 1198 L 1451.5 725",
-        wOut: "M 1709 664 L 1820 664",
+        /* Ends nudged to meet lowered mark left edge */
+        wExt: "M 676.5 334 V 271 L 1450 620",
+        wTel: "M 892.5 690 L 935.5 669 H 1450",
+        wApp: "M 466.5 1000 L 782.5 1198 L 1450 718",
+        wOut: "M 1709 669 L 1820 669",
       };
 
       const CHIP_DEFS = [
@@ -502,6 +506,9 @@
         { path: "wApp", name: "Demand forecast", tag: "↑ 5%", dir: "up", phase: 0.32, speed: 0.00005 },
         { path: "wExt", name: "TOU tariff", tag: "↑ 6%", dir: "up", phase: 0.82, speed: 0.000046 },
         { path: "wApp", name: "Shift plan", tag: "↑ 2%", dir: "up", phase: 0.78, speed: 0.000044 },
+        /* Bare dots on logo → recs (Vector 10) */
+        { path: "wOut", bare: true, phase: 0.18, speed: 0.00007 },
+        { path: "wOut", bare: true, phase: 0.62, speed: 0.000064 },
       ];
 
       const RX_ITEMS = [
@@ -548,7 +555,7 @@
             }
             if (mode === "logo") {
               const y = startY * (1 - e);
-              el.style.transform = `translate(-50%, -50%) translateY(${y}px)`;
+              el.style.transform = `translateX(-50%) translateY(${y}px)`;
             } else if (mode === "plant") {
               el.style.opacity = String(fromOp + (props.opacity - fromOp) * e);
             } else if (mode === "rx") {
@@ -650,17 +657,21 @@
         root.innerHTML = "";
         CHIP_DEFS.forEach((def) => {
           const el = document.createElement("div");
-          el.className = "chip";
+          el.className = "chip" + (def.bare ? " is-bare" : "");
           el.dataset.path = def.path;
           el.dataset.phase = String(def.phase);
           el.dataset.speed = String(def.speed);
-          el.innerHTML =
-            `<span class="chip-node" aria-hidden="true"></span>` +
-            `<span class="chip-label">` +
-            `<span class="chip-stem" aria-hidden="true"></span>` +
-            `<span class="chip-name">${def.name}</span>` +
-            `<span class="chip-tag ${def.dir === "down" ? "is-down" : ""}">${def.tag}</span>` +
-            `</span>`;
+          if (def.bare) {
+            el.innerHTML = `<span class="chip-node" aria-hidden="true"></span>`;
+          } else {
+            el.innerHTML =
+              `<span class="chip-node" aria-hidden="true"></span>` +
+              `<span class="chip-label">` +
+              `<span class="chip-stem" aria-hidden="true"></span>` +
+              `<span class="chip-name">${def.name}</span>` +
+              `<span class="chip-tag ${def.dir === "down" ? "is-down" : ""}">${def.tag}</span>` +
+              `</span>`;
+          }
           root.appendChild(el);
         });
       }
@@ -710,7 +721,7 @@
             const len = path.getTotalLength();
             const pt = path.getPointAtLength(phase * len);
             const screen = svgToScreen(pt.x, pt.y);
-            const edge = phase < 0.1 ? phase / 0.1 : phase > 0.86 ? (1 - phase) / 0.14 : 1;
+            const edge = phase < 0.04 ? phase / 0.04 : phase > 0.94 ? (1 - phase) / 0.06 : 1;
             chip.style.opacity = String(0.15 + 0.85 * edge);
             chip.style.transform = `translate(${screen.x}px, ${screen.y}px)`;
           });
@@ -770,7 +781,7 @@
           [plant, logo, panel, live, footnote, ...srcs, ...docks].forEach((el) => {
             el.style.opacity = "1";
           });
-          logo.style.transform = "translate(-50%, -50%)";
+          logo.style.transform = "translateX(-50%)";
           panel.style.transform = "translateY(-50%)";
           srcs.forEach((el) => {
             el.style.transform = "translate(-50%, calc(-100% - 12px))";
