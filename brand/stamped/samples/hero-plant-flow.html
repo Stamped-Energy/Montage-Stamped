@@ -591,25 +591,26 @@
       };
 
       /* Shared speed keeps same-path spacing stable; phases are staggered per wire */
+      /* Phase speed for long inbound wires; out relay is length-normalized in startChipLoop */
       const CHIP_SPEED = 0.000038;
       const CHIP_DEFS = [
-        { path: "wExt", name: "Feedstock", tag: "↑ 8%", dir: "up", phase: 0.14, speed: CHIP_SPEED },
+        { path: "wExt", name: "Energy price", tag: "↑ 8%", dir: "up", phase: 0.14, speed: CHIP_SPEED },
         { path: "wTel", name: "Power draw", tag: "↑ 8%", dir: "up", phase: 0.42, speed: CHIP_SPEED },
         { path: "wApp", name: "Demand forecast", tag: "↑ 5%", dir: "up", phase: 0.18, speed: CHIP_SPEED },
-        { path: "wExt", name: "TOU tariff", tag: "↑ 6%", dir: "up", phase: 0.64, speed: CHIP_SPEED },
+        { path: "wExt", name: "ToD tariff", tag: "↑ 6%", dir: "up", phase: 0.64, speed: CHIP_SPEED },
         { path: "wApp", name: "Shift plan", tag: "↑ 2%", dir: "up", phase: 0.68, speed: CHIP_SPEED },
-        /* One coral relay Stamped → prescriptions; next starts when this completes */
+        /* One coral relay Stamped → prescriptions; speed matched to inbound px/ms */
         { path: "wOut", bare: true, sequential: true, phase: 0, speed: CHIP_SPEED },
       ];
 
       const RX_ITEMS = [
         { money: "+ ₹2.4L", label: "Annual", copy: "Optimize Shift 2 planning before peak reset" },
-        { money: "+ ₹48,000", label: "Avoid scrap", copy: "Correct setpoint for feedstock drift" },
+        { money: "+ ₹48,000", label: "Avoid scrap", copy: "Correct furnace hold after batch drift" },
         { money: "+ ₹95,000", label: "Demand", copy: "Stagger high-load assets to cut MD" },
         { money: "+ ₹42,000", label: "Idle waste", copy: "Shed idle HVAC during changeover" },
-        { money: "+ ₹38,000", label: "TOU", copy: "Pull forward batch into off-peak window" },
+        { money: "+ ₹38,000", label: "ToD", copy: "Pull forward batch into off-peak window" },
         { money: "+ ₹12,000", label: "PF", copy: "Correct lagging bank on feeder 3" },
-        { money: "+ ₹1.8L", label: "Baseline", copy: "Retune dryer SEC after feedstock change" },
+        { money: "+ ₹1.8L", label: "Baseline", copy: "Retune dryer SEC after recipe change" },
         { money: "+ ₹11,000", label: "Leak", copy: "Inspect compressed-air branch on Line B" },
         { money: "+ ₹75,000", label: "Schedule", copy: "Avoid MD spike at shift overlap" },
       ];
@@ -827,17 +828,38 @@
           c.style.opacity = "1";
         });
 
+        function matchOutRelaySpeed() {
+          const inboundLens = ["wExt", "wTel", "wApp"]
+            .map((id) => pathCache[id] || document.getElementById(id))
+            .map((p) => (p && p.getAttribute("d") ? p.getTotalLength() : 0))
+            .filter((n) => n > 0);
+          if (!inboundLens.length) return;
+          const avgLen = inboundLens.reduce((a, b) => a + b, 0) / inboundLens.length;
+          const pxPerMs = CHIP_SPEED * avgLen;
+          chips.forEach((c) => {
+            if (c.dataset.sequential !== "1") return;
+            const path = pathCache[c.dataset.path];
+            if (!path || !path.getAttribute("d")) return;
+            const len = path.getTotalLength() || 1;
+            c.dataset.speed = String(pxPerMs / len);
+          });
+        }
+
+        matchOutRelaySpeed();
+
         let last = performance.now();
+        let syncEvery = 0;
         (function tick(now) {
           const dt = Math.min(40, now - last);
           last = now;
+          if ((syncEvery++ & 31) === 0) matchOutRelaySpeed();
           chips.forEach((chip) => {
             const path = pathCache[chip.dataset.path];
             if (!path || !path.getAttribute("d")) return;
             const speed = parseFloat(chip.dataset.speed) || 0.0001;
             let phase = parseFloat(chip.dataset.phase) || 0;
             phase = phase + dt * speed;
-            /* Sequential out relay: finish at hub, then restart from Stamped */
+            /* Sequential out relay: finish at prescriptions, then restart from Stamped */
             if (chip.dataset.sequential === "1") {
               if (phase >= 1) phase = 0;
             } else {
