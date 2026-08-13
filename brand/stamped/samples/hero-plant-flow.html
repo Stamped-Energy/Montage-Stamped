@@ -525,7 +525,8 @@
 
       const LAYOUT = {
         docks: [
-          { id: "wExt", label: "srcExt", dock: "dockExt" },
+          /* Ext label lifted above the vertical elbow; dock stays on wire start */
+          { id: "wExt", label: "srcExt", dock: "dockExt", labelAt: 63, labelLift: 56 },
           { id: "wTel", label: "srcTel", dock: "dockTel" },
           { id: "wApp", label: "srcApp", dock: "dockApp" },
         ],
@@ -611,14 +612,18 @@
           if (!path || !path.getAttribute("d")) return;
           const len = path.getTotalLength();
           if (!len) return;
-          const pt = path.getPointAtLength(0);
-          const screen = svgToScreen(pt.x, pt.y);
+          const dockPt = path.getPointAtLength(0);
+          const dockScreen = svgToScreen(dockPt.x, dockPt.y);
+          const labelLen = Math.min(len, dock.labelAt != null ? dock.labelAt : 0);
+          const labelPt = path.getPointAtLength(labelLen);
+          const labelScreen = svgToScreen(labelPt.x, labelPt.y);
+          const lift = dock.labelLift || 0;
           const label = document.getElementById(dock.label);
           const dot = document.getElementById(dock.dock);
-          label.style.left = `${screen.x}px`;
-          label.style.top = `${screen.y}px`;
-          dot.style.left = `${screen.x}px`;
-          dot.style.top = `${screen.y}px`;
+          label.style.left = `${labelScreen.x}px`;
+          label.style.top = `${labelScreen.y - lift}px`;
+          dot.style.left = `${dockScreen.x}px`;
+          dot.style.top = `${dockScreen.y}px`;
         });
       }
 
