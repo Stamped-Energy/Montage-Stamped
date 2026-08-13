@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #f7faf5;
+      --bg: #fcfcfb;
       --ink: #111110;
       --mute: #5c5c59;
       --line: #1a1a18;
@@ -23,6 +23,9 @@
       --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
       --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
       --font-label: "IBM Plex Mono", ui-monospace, monospace;
+      /* Frame 9 canvas */
+      --f9-w: 2529;
+      --f9-h: 1274;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,7 +41,10 @@
 
     .stage {
       width: min(1280px, 98vw);
-      height: min(780px, 96vh);
+      /* Match Frame 9 aspect so SVG meet has no letterbox offset */
+      aspect-ratio: 2529 / 1274;
+      height: auto;
+      max-height: 96vh;
       margin: 2vh auto;
       position: relative;
     }
@@ -47,11 +53,10 @@
       position: absolute;
       inset: 0;
       overflow: hidden;
-      background:
-        radial-gradient(ellipse 70% 55% at 28% 52%, #ffffffaa 0%, transparent 62%),
-        var(--bg);
+      background: var(--bg);
     }
 
+    /* SVG uses Frame 9 viewBox so wire d values stay in Figma coords */
     .scene-svg {
       position: absolute;
       inset: 0;
@@ -64,20 +69,23 @@
     .wire {
       fill: none;
       stroke: var(--line);
-      stroke-width: 1.25;
+      stroke-width: 2.5;
       stroke-linecap: square;
       stroke-linejoin: miter;
       opacity: 0;
     }
 
-    /* Plant art — left anchor */
+    .wire.wire-out {
+      stroke-width: 2;
+    }
+
+    /* Plant — Frame 9 slot ~0% / 12.5% / 37% / 81% */
     .plant {
       position: absolute;
-      left: 2%;
-      top: 50%;
-      width: min(500px, 40%);
-      max-height: 84%;
-      transform: translateY(-50%);
+      left: 0;
+      top: 12.5%;
+      width: 37%;
+      height: 81%;
       z-index: 1;
       opacity: 0;
       overflow: visible;
@@ -87,8 +95,7 @@
 
     .plant img {
       width: 100%;
-      height: auto;
-      max-height: min(450px, 78vh);
+      height: 100%;
       object-fit: contain;
       object-position: left center;
       display: block;
@@ -140,7 +147,6 @@
       pointer-events: none;
     }
 
-    /* Traveling signal chips — match C-Vector-style pin labels */
     .signals {
       position: absolute;
       inset: 0;
@@ -159,7 +165,6 @@
       white-space: nowrap;
     }
 
-    /* Black node sits on the wire */
     .chip-node {
       position: absolute;
       left: 0;
@@ -171,7 +176,6 @@
       background: var(--ink);
     }
 
-    /* Label floats above the node with a double-line stem */
     .chip-label {
       position: absolute;
       left: -2px;
@@ -238,10 +242,11 @@
       background: #4a2c28;
     }
 
+    /* Logo — Frame 9 ~59% / center, ~9% width */
     .logo-wrap {
       position: absolute;
       z-index: 4;
-      left: clamp(56%, calc(100% - 300px), 68%);
+      left: 59.2%;
       top: 50%;
       display: flex;
       flex-direction: column;
@@ -252,8 +257,8 @@
     }
 
     .logo-wrap img {
-      width: min(92px, 9vw);
-      height: min(92px, 9vw);
+      width: min(112px, 8.7vw);
+      height: min(112px, 8.7vw);
       display: block;
     }
 
@@ -268,15 +273,16 @@
       padding: 6px 12px;
     }
 
-    /* Recommendations: viewport shows 2 slots; track slides up */
+    /* Recs — Frame 9 ~72% left, vertically with mark */
     .rx-panel {
       position: absolute;
-      top: 8%;
-      right: 2.5%;
-      width: min(300px, 26vw);
+      top: 50%;
+      left: 72%;
+      right: auto;
+      width: min(340px, 26%);
       z-index: 6;
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(calc(-50% + 10px));
     }
 
     .rx-head {
@@ -393,16 +399,17 @@
     }
 
     @media (max-width: 1100px) {
-      .plant { width: min(400px, 38%); }
-      .logo-wrap { left: clamp(54%, calc(100% - 290px), 64%); }
-      .rx-panel { width: min(260px, 28vw); }
+      .plant { width: 40%; }
+      .logo-wrap { left: 56%; }
+      .logo-wrap img { width: min(96px, 9vw); height: min(96px, 9vw); }
+      .rx-panel { left: 70%; width: min(280px, 28%); }
     }
 
     @media (max-width: 900px) {
-      .plant { width: min(300px, 36%); left: 1.5%; }
-      .logo-wrap { left: 58%; }
-      .logo-wrap img { width: min(76px, 11vw); height: min(76px, 11vw); }
-      .rx-panel { width: min(220px, 32vw); right: 1.5%; }
+      .plant { width: 42%; top: 14%; height: 72%; }
+      .logo-wrap { left: 54%; }
+      .logo-wrap img { width: min(80px, 11vw); height: min(80px, 11vw); }
+      .rx-panel { left: 68%; width: min(240px, 30%); }
       .rx-copy { font-size: 12px; }
       :root { --rx-h: 72px; }
     }
@@ -412,6 +419,7 @@
         opacity: 1 !important;
       }
       .logo-wrap { transform: translate(-50%, -50%) !important; }
+      .rx-panel { transform: translateY(-50%) !important; }
       .src-label { transform: translate(-50%, calc(-100% - 12px)) !important; }
       .rx-track { transition: none !important; }
       .chip { opacity: 0.85 !important; }
@@ -421,22 +429,24 @@
 <body>
   <div class="stage" id="stage">
     <div class="scene" id="scene">
-      <!-- Plant art: brand/stamped/assets/plant-placeholder.png -->
+      <!-- Plant: Frame 9 asset (transparent) -->
       <div class="plant" id="plant">
         <div class="plant-fallback" id="plantFallback">Plant photo<br />placeholder</div>
         <img
           id="plantImg"
-          src="../assets/plant-placeholder.png?v=plant3r"
+          src="../assets/plant-placeholder.png?v=frame9"
           alt=""
           onload="document.getElementById('plantFallback').style.display='none';"
           onerror="this.remove(); document.getElementById('plantFallback').style.display='grid';"
         />
       </div>
 
-      <svg class="scene-svg" id="svg" viewBox="0 0 1280 780" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <!-- viewBox = Frame 9 (2529×1274); paths from Figma Vectors 11–13 + out connector -->
+      <svg class="scene-svg" id="svg" viewBox="0 0 2529 1274" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <path class="wire" id="wExt" />
         <path class="wire" id="wTel" />
         <path class="wire" id="wApp" />
+        <path class="wire wire-out" id="wOut" />
       </svg>
 
       <span class="dock-dot" id="dockExt" aria-hidden="true"></span>
@@ -473,8 +483,21 @@
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
-      /* Signal chips that travel the wires forever after open */
-      /* One chip per wire — sparse, readable */
+      /*
+        Frame 9 wire paths — absolute coords in 2529×1274 space.
+        Source SVGs: brand/stamped/assets/figma-frame9/wire-*.svg
+        Vector 11 (ext) @ (684, 262.5)
+        Vector 12 (tel) @ (813.5, 658)
+        Vector 13 (app) @ (425.5, 731) — reversed so travel is plant → logo
+        Out connector: logo right → recs left (horizontal)
+      */
+      const FRAME9_PATHS = {
+        wExt: "M 686 398.034 V 265.534 L 1452 594.034",
+        wTel: "M 814.611 739.5 L 933.611 660 H 1455.611",
+        wApp: "M 426.537 908.086 L 871.537 1178.086 L 1451.04 732.586",
+        wOut: "M 1712 651 L 1820 651",
+      };
+
       const CHIP_DEFS = [
         { path: "wExt", name: "Feedstock", tag: "↑ 8%", dir: "up", phase: 0.28, speed: 0.000052 },
         { path: "wTel", name: "Power draw", tag: "↑ 8%", dir: "up", phase: 0.48, speed: 0.000048 },
@@ -483,7 +506,6 @@
         { path: "wApp", name: "Shift plan", tag: "↑ 2%", dir: "up", phase: 0.78, speed: 0.000044 },
       ];
 
-      /* 9 recommendations — only 2 visible; carousel after open */
       const RX_ITEMS = [
         { money: "+ ₹2.4M", label: "Annual", copy: "Optimize Shift 2 planning before peak reset" },
         { money: "+ ₹165K", label: "Avoid scrap", copy: "Correct setpoint for feedstock drift" },
@@ -498,12 +520,10 @@
 
       const LAYOUT = {
         docks: [
-          /* Ext/App: into plant + vertically away from telemetry */
-          { id: "wExt", label: "srcExt", dock: "dockExt", yFrac: 0.1, xInset: 118 },
-          { id: "wTel", label: "srcTel", dock: "dockTel", yFrac: 0.5, xInset: 4 },
-          { id: "wApp", label: "srcApp", dock: "dockApp", yFrac: 0.9, xInset: 118 },
+          { id: "wExt", label: "srcExt", dock: "dockExt" },
+          { id: "wTel", label: "srcTel", dock: "dockTel" },
+          { id: "wApp", label: "srcApp", dock: "dockApp" },
         ],
-        logo: { x: 640, y: 340 },
       };
 
       let chipRaf = 0;
@@ -532,6 +552,8 @@
               const y = startY * (1 - e);
               el.style.transform = `translate(-50%, -50%) translateY(${y}px)`;
             } else if (mode === "plant") {
+              el.style.opacity = String(fromOp + (props.opacity - fromOp) * e);
+            } else if (mode === "rx") {
               const y = startY * (1 - e);
               el.style.transform = `translateY(calc(-50% + ${y}px))`;
             } else if (mode === "label") {
@@ -547,11 +569,9 @@
       }
 
       function layoutPaths() {
-        const plant = document.getElementById("plant");
         const logo = document.getElementById("logoWrap");
+        const panel = document.getElementById("rxPanel");
         const svg = document.getElementById("svg");
-        const pr = plant.getBoundingClientRect();
-        const lr = logo.getBoundingClientRect();
         const ctm = svg.getScreenCTM();
         if (!ctm) return;
         const inv = ctm.inverse();
@@ -563,35 +583,31 @@
           return pt.matrixTransform(inv);
         }
 
-        const logoCenter = toSvg(lr.left + lr.width / 2, lr.top + lr.height / 2);
-        const logoLeft = toSvg(lr.left + 2, lr.top + lr.height / 2);
-        const hubX = logoLeft.x;
-        const hubY = logoCenter.y;
-        /* Prefer the rendered image box when available (tighter than empty wrapper) */
-        const img = document.getElementById("plantImg");
-        const box = img && img.getClientRects().length ? img.getBoundingClientRect() : pr;
-        const gap = Math.max(0, lr.left - box.right);
-        /* Short horizontal, then long sharp diagonal (matches reference elbow) */
-        const turnX = toSvg(box.right + Math.max(52, gap * 0.2), box.top).x;
-        const fan = 78;
+        /* Inbound wires: fixed Frame 9 geometry */
+        Object.keys(FRAME9_PATHS).forEach((id) => {
+          if (id === "wOut") return;
+          const path = document.getElementById(id);
+          if (path) path.setAttribute("d", FRAME9_PATHS[id]);
+        });
 
-        LAYOUT.docks.forEach((dock, i) => {
-          const inset = dock.xInset || 0;
-          const origin = toSvg(box.right - 4 - inset, box.top + box.height * dock.yFrac);
+        /* Out connector: live from mark right edge → recs left (not caption box) */
+        const logoImg = logo.querySelector("img") || logo;
+        const lr = logoImg.getBoundingClientRect();
+        const pr = panel.getBoundingClientRect();
+        const midY = lr.top + lr.height * 0.5;
+        const outStart = toSvg(lr.right - 1, midY);
+        const outEnd = toSvg(pr.left + 2, midY);
+        const wOut = document.getElementById("wOut");
+        wOut.setAttribute("d", `M ${outStart.x} ${outStart.y} L ${outEnd.x} ${outEnd.y}`);
+
+        /* Labels + docks at inbound path starts (plant side) */
+        LAYOUT.docks.forEach((dock) => {
           const path = document.getElementById(dock.id);
-          const targetY = hubY + (i - 1) * fan;
-          const ox = origin.x;
-          const oy = origin.y;
-          const mx = Math.min(turnX + (inset > 0 ? 18 : 0), hubX - 48);
-          let d;
-          if (Math.abs(targetY - oy) < 3) {
-            d = `M ${ox} ${oy} L ${hubX} ${oy}`;
-          } else {
-            d = `M ${ox} ${oy} L ${mx} ${oy} L ${hubX} ${targetY}`;
-          }
-          path.setAttribute("d", d);
-
-          const screen = svgToScreen(origin.x, origin.y);
+          if (!path || !path.getAttribute("d")) return;
+          const len = path.getTotalLength();
+          if (!len) return;
+          const pt = path.getPointAtLength(0);
+          const screen = svgToScreen(pt.x, pt.y);
           const label = document.getElementById(dock.label);
           const dot = document.getElementById(dock.dock);
           label.style.left = `${screen.x}px`;
@@ -634,7 +650,7 @@
       function buildChips() {
         const root = document.getElementById("signals");
         root.innerHTML = "";
-        CHIP_DEFS.forEach((def, i) => {
+        CHIP_DEFS.forEach((def) => {
           const el = document.createElement("div");
           el.className = "chip";
           el.dataset.path = def.path;
@@ -653,7 +669,6 @@
 
       function buildRx() {
         const track = document.getElementById("rxTrack");
-        /* Duplicate first VISIBLE items at end for seamless loop feel */
         const visible = 2;
         const list = [...RX_ITEMS, ...RX_ITEMS.slice(0, visible)];
         track.innerHTML = list
@@ -697,10 +712,8 @@
             const len = path.getTotalLength();
             const pt = path.getPointAtLength(phase * len);
             const screen = svgToScreen(pt.x, pt.y);
-            /* Longer fade at ends → fewer chips readable at once */
             const edge = phase < 0.1 ? phase / 0.1 : phase > 0.86 ? (1 - phase) / 0.14 : 1;
             chip.style.opacity = String(0.15 + 0.85 * edge);
-            /* Node sits exactly on the path point */
             chip.style.transform = `translate(${screen.x}px, ${screen.y}px)`;
           });
           chipRaf = requestAnimationFrame(tick);
@@ -713,7 +726,6 @@
         rxIndex += 1;
         track.style.transform = `translateY(${-rxIndex * itemH}px)`;
 
-        /* When we reach the duplicated tail, snap back without animation */
         if (rxIndex >= RX_ITEMS.length) {
           setTimeout(() => {
             track.style.transition = "none";
@@ -754,17 +766,18 @@
         const wExt = document.getElementById("wExt");
         const wTel = document.getElementById("wTel");
         const wApp = document.getElementById("wApp");
+        const wOut = document.getElementById("wOut");
 
         if (reduce) {
           [plant, logo, panel, live, footnote, ...srcs, ...docks].forEach((el) => {
             el.style.opacity = "1";
           });
-          plant.style.transform = "translateY(-50%)";
           logo.style.transform = "translate(-50%, -50%)";
+          panel.style.transform = "translateY(-50%)";
           srcs.forEach((el) => {
             el.style.transform = "translate(-50%, calc(-100% - 12px))";
           });
-          [wExt, wTel, wApp].forEach((w) => {
+          [wExt, wTel, wApp, wOut].forEach((w) => {
             w.style.opacity = "1";
             w.style.strokeDasharray = "none";
             w.style.strokeDashoffset = "0";
@@ -779,8 +792,7 @@
           return;
         }
 
-        /* Opening: plant left → docks/labels → wires into large Stamped mark */
-        await tween(plant, { opacity: 1, mode: "plant", startY: 10 }, 650, 0);
+        await tween(plant, { opacity: 1, mode: "plant" }, 650, 0);
         await tween(logo, { opacity: 1, mode: "logo", startY: 10 }, 620, 40);
         layoutPaths();
 
@@ -797,7 +809,9 @@
 
         startChipLoop();
 
-        await tween(panel, { opacity: 1, y: 0, startY: 10 }, 520, 80);
+        await tween(panel, { opacity: 1, mode: "rx", startY: 10 }, 520, 80);
+        layoutPaths();
+        await drawWire(wOut, 420, 0);
         await tween(live, { opacity: 1 }, 280, 40);
         await tween(footnote, { opacity: 1 }, 360, 0);
 
