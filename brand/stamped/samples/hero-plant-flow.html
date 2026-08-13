@@ -22,7 +22,7 @@
       --tag-pos-ink: #fbfcf9;
       --tag-neg: #ffdad4;
       --tag-neg-ink: #5a403c;
-      --rx-h: 112px;
+      --rx-h: 124px;
       --rx-visible: 2;
       --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
       --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
@@ -176,20 +176,23 @@
       top: 0;
       width: 0;
       height: 0;
-      opacity: 0;
-      will-change: transform, opacity;
+      opacity: 1;
+      visibility: hidden;
       white-space: nowrap;
+      /* No transform/opacity here — keeps nodes+labels in one shared stacking context */
     }
 
     .chip-node {
       position: absolute;
       left: 0;
       top: 0;
+      z-index: 1;
       width: 10px;
       height: 10px;
       margin: -5px 0 0 -5px;
       border-radius: 50%;
       background: var(--coral);
+      opacity: 0;
       box-shadow:
         0 0 0 2px var(--cream),
         0 0 0 5px var(--halo);
@@ -211,12 +214,15 @@
 
     .chip-label {
       position: absolute;
-      left: 4px;
+      left: 0;
       bottom: 12px;
+      z-index: 2;
+      transform: translateX(-50%);
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 8px 6px 12px;
+      padding: 6px 10px 6px 12px;
+      opacity: 0;
       background: var(--cream);
       border: 1px solid color-mix(in srgb, var(--outline) 40%, var(--coral));
       border-radius: 999px;
@@ -442,11 +448,11 @@
 
     .rx-tag {
       font-family: var(--font-label);
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      padding: 5px 10px;
+      padding: 6px 11px;
       border: 1px solid var(--outline);
       border-radius: 999px;
       background: var(--surface-low);
@@ -458,14 +464,14 @@
       border-color: transparent;
       color: var(--tag-pos-ink);
       font-weight: 700;
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 0.02em;
       box-shadow: 0 1px 0 color-mix(in srgb, var(--tag-pos-ink) 12%, transparent);
     }
 
     .rx-copy {
       font-family: var(--font-display);
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
       letter-spacing: -0.025em;
       line-height: 1.3;
@@ -484,7 +490,7 @@
       .rx-panel { right: 1.25%; width: min(340px, 29%); }
       .logo-caption { font-size: clamp(16px, 1.8vw, 20px); }
       .rx-sub { font-size: 11px; }
-      :root { --rx-h: 102px; }
+      :root { --rx-h: 114px; }
     }
 
     @media (max-width: 900px) {
@@ -498,11 +504,13 @@
       .rx-panel { right: 1%; width: min(270px, 31%); }
       .rx-title { font-size: clamp(15px, 2vw, 18px); }
       .rx-sub { font-size: 10px; }
-      .rx-copy { font-size: 14px; }
+      .rx-tag { font-size: 11px; }
+      .rx-tag.is-money { font-size: 12px; }
+      .rx-copy { font-size: 16px; }
       .chip-name { font-size: 12px; }
       .src-label { font-size: 11px; padding: 7px 12px; }
       .logo-caption { font-size: clamp(15px, 2vw, 18px); }
-      :root { --rx-h: 96px; }
+      :root { --rx-h: 108px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -513,7 +521,8 @@
       .rx-panel { transform: translateY(-50%) !important; }
       .src-label { transform: translate(-50%, calc(-100% - 12px)) !important; }
       .rx-track { transition: none !important; }
-      .chip { opacity: 0.85 !important; }
+      .chip-node, .chip-label { opacity: 0.85 !important; }
+      .chip { opacity: 1 !important; visibility: visible !important; }
       .chip-node, .rx-live::before { animation: none !important; }
     }
   </style>
@@ -604,15 +613,15 @@
       ];
 
       const RX_ITEMS = [
-        { money: "+ ₹2.4L", label: "Annual", copy: "Optimize Shift 2 planning before peak reset" },
-        { money: "+ ₹48,000", label: "Avoid scrap", copy: "Correct furnace hold after batch drift" },
-        { money: "+ ₹95,000", label: "Demand", copy: "Stagger high-load assets to cut MD" },
-        { money: "+ ₹42,000", label: "Idle waste", copy: "Shed idle HVAC during changeover" },
-        { money: "+ ₹38,000", label: "ToD", copy: "Pull forward batch into off-peak window" },
-        { money: "+ ₹12,000", label: "PF", copy: "Correct lagging bank on feeder 3" },
-        { money: "+ ₹1.8L", label: "Baseline", copy: "Retune dryer SEC after recipe change" },
-        { money: "+ ₹11,000", label: "Leak", copy: "Inspect compressed-air branch on Line B" },
-        { money: "+ ₹75,000", label: "Schedule", copy: "Avoid MD spike at shift overlap" },
+        { money: "+ ₹2.4L", label: "Annual", copy: "Reschedule Shift 2 heavy loads before the evening demand peak" },
+        { money: "+ ₹48,000", label: "Avoid scrap", copy: "Lower furnace hold temperature after this batch ran hot" },
+        { money: "+ ₹95,000", label: "Demand", copy: "Stagger high-load startups to cut maximum demand charges" },
+        { money: "+ ₹42,000", label: "Idle waste", copy: "Turn down idle HVAC during the line changeover window" },
+        { money: "+ ₹38,000", label: "Off-peak", copy: "Pull this batch forward into the cheaper off-peak tariff window" },
+        { money: "+ ₹12,000", label: "Power factor", copy: "Switch on power-factor correction on feeder 3" },
+        { money: "+ ₹1.8L", label: "Baseline", copy: "Retune dryer energy settings after the latest recipe change" },
+        { money: "+ ₹11,000", label: "Leak", copy: "Inspect the compressed-air branch on Line B for leaks" },
+        { money: "+ ₹75,000", label: "Schedule", copy: "Avoid a demand spike when both shifts start together" },
       ];
 
       const LAYOUT = {
@@ -826,6 +835,10 @@
           const id = c.dataset.path;
           if (!pathCache[id]) pathCache[id] = document.getElementById(id);
           c.style.opacity = "1";
+          const node = c.querySelector(".chip-node");
+          if (node) node.style.opacity = "0";
+          const label = c.querySelector(".chip-label");
+          if (label) label.style.opacity = "0";
         });
 
         function matchOutRelaySpeed() {
@@ -869,21 +882,25 @@
             const len = path.getTotalLength();
             const pt = path.getPointAtLength(phase * len);
             const screen = svgToScreen(pt.x, pt.y);
-            /* Dot keeps late fade near hub; label clears ~1s earlier (~0.05 phase) */
+            const node = chip.querySelector(".chip-node");
+            const label = chip.querySelector(".chip-label");
+            /* Dot keeps late fade near hub; label fades ~0.6s starting ~2.6s before hub */
             const nodeEdge =
               phase < 0.04 ? phase / 0.04 : phase > 0.94 ? (1 - phase) / 0.06 : 1;
-            chip.style.opacity = String(0.15 + 0.85 * nodeEdge);
-            chip.style.transform = `translate(${screen.x}px, ${screen.y}px)`;
-            const label = chip.querySelector(".chip-label");
+            const baseOp = 0.15 + 0.85 * nodeEdge;
+            chip.style.left = `${screen.x}px`;
+            chip.style.top = `${screen.y}px`;
+            chip.style.transform = "none";
+            chip.style.visibility = "visible";
+            if (node) node.style.opacity = String(baseOp);
             if (label) {
-              /* Hide text before the logo hub so pills don't cover Stamped */
               const labelEdge =
                 phase < 0.04
                   ? phase / 0.04
-                  : phase > 0.72
-                    ? Math.max(0, (0.82 - phase) / 0.1)
+                  : phase > 0.9
+                    ? Math.max(0, (0.923 - phase) / 0.023)
                     : 1;
-              label.style.opacity = String(labelEdge);
+              label.style.opacity = String(baseOp * labelEdge);
             }
           });
           chipRaf = requestAnimationFrame(tick);
@@ -955,8 +972,15 @@
             const path = document.getElementById(CHIP_DEFS[i].path);
             const pt = path.getPointAtLength(path.getTotalLength() * CHIP_DEFS[i].phase);
             const screen = svgToScreen(pt.x, pt.y);
+            c.style.left = `${screen.x}px`;
+            c.style.top = `${screen.y}px`;
+            c.style.transform = "none";
             c.style.opacity = "1";
-            c.style.transform = `translate(${screen.x}px, ${screen.y}px)`;
+            c.style.visibility = "visible";
+            const node = c.querySelector(".chip-node");
+            if (node) node.style.opacity = "1";
+            const label = c.querySelector(".chip-label");
+            if (label) label.style.opacity = "1";
           });
           return;
         }
