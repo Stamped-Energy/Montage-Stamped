@@ -9,10 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #fcfcfb;
+      --bg: #f7faf5;
       --ink: #111110;
       --mute: #5c5c59;
-      --line: #111110;
+      --line: #1a1a18;
       --coral: #F75440;
       --tag-pos: #dfe8d8;
       --tag-pos-ink: #2f3a28;
@@ -47,7 +47,9 @@
       position: absolute;
       inset: 0;
       overflow: hidden;
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse 70% 55% at 28% 52%, #ffffffaa 0%, transparent 62%),
+        var(--bg);
     }
 
     .scene-svg {
@@ -62,19 +64,19 @@
     .wire {
       fill: none;
       stroke: var(--line);
-      stroke-width: 1.4;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      stroke-width: 1.25;
+      stroke-linecap: square;
+      stroke-linejoin: miter;
       opacity: 0;
     }
 
-    /* Plant art — large left anchor */
+    /* Plant art — left anchor */
     .plant {
       position: absolute;
       left: 2%;
       top: 50%;
-      width: min(480px, 38%);
-      max-height: 82%;
+      width: min(500px, 40%);
+      max-height: 84%;
       transform: translateY(-50%);
       z-index: 1;
       opacity: 0;
@@ -86,11 +88,10 @@
     .plant img {
       width: 100%;
       height: auto;
-      max-height: min(430px, 76vh);
+      max-height: min(450px, 78vh);
       object-fit: contain;
       object-position: left center;
       display: block;
-      /* Edited asset is transparent PNG — keep no filter wash */
       filter: none;
       mix-blend-mode: normal;
     }
@@ -206,9 +207,16 @@
       font-weight: 500;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: color-mix(in srgb, var(--ink) 88%, transparent);
+      color: color-mix(in srgb, var(--ink) 90%, transparent);
       line-height: 1;
       padding-bottom: 1px;
+      text-shadow:
+        0 0 8px var(--bg),
+        0 0 3px var(--bg),
+        1px 0 0 var(--bg),
+        -1px 0 0 var(--bg),
+        0 1px 0 var(--bg),
+        0 -1px 0 var(--bg);
     }
 
     .chip-tag {
@@ -233,7 +241,7 @@
     .logo-wrap {
       position: absolute;
       z-index: 4;
-      left: clamp(54%, calc(100% - 320px), 66%);
+      left: clamp(56%, calc(100% - 300px), 68%);
       top: 50%;
       display: flex;
       flex-direction: column;
@@ -244,8 +252,8 @@
     }
 
     .logo-wrap img {
-      width: min(100px, 10vw);
-      height: min(100px, 10vw);
+      width: min(92px, 9vw);
+      height: min(92px, 9vw);
       display: block;
     }
 
@@ -385,15 +393,15 @@
     }
 
     @media (max-width: 1100px) {
-      .plant { width: min(380px, 36%); }
-      .logo-wrap { left: clamp(52%, calc(100% - 300px), 62%); }
+      .plant { width: min(400px, 38%); }
+      .logo-wrap { left: clamp(54%, calc(100% - 290px), 64%); }
       .rx-panel { width: min(260px, 28vw); }
     }
 
     @media (max-width: 900px) {
-      .plant { width: min(290px, 34%); left: 1.5%; }
-      .logo-wrap { left: 56%; }
-      .logo-wrap img { width: min(80px, 12vw); height: min(80px, 12vw); }
+      .plant { width: min(300px, 36%); left: 1.5%; }
+      .logo-wrap { left: 58%; }
+      .logo-wrap img { width: min(76px, 11vw); height: min(76px, 11vw); }
       .rx-panel { width: min(220px, 32vw); right: 1.5%; }
       .rx-copy { font-size: 12px; }
       :root { --rx-h: 72px; }
@@ -418,14 +426,14 @@
         <div class="plant-fallback" id="plantFallback">Plant photo<br />placeholder</div>
         <img
           id="plantImg"
-          src="../assets/plant-placeholder.png?v=upscale"
+          src="../assets/plant-placeholder.png?v=plant3r"
           alt=""
           onload="document.getElementById('plantFallback').style.display='none';"
           onerror="this.remove(); document.getElementById('plantFallback').style.display='grid';"
         />
       </div>
 
-      <svg class="scene-svg" id="svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <svg class="scene-svg" id="svg" viewBox="0 0 1280 780" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <path class="wire" id="wExt" />
         <path class="wire" id="wTel" />
         <path class="wire" id="wApp" />
@@ -466,13 +474,13 @@
       const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
       /* Signal chips that travel the wires forever after open */
-      /* Fewer chips, slower travel — ~1–2 visible mid-path at a time */
+      /* One chip per wire — sparse, readable */
       const CHIP_DEFS = [
-        { path: "wExt", name: "Feedstock", tag: "↑ 8%", dir: "up", phase: 0.22, speed: 0.000042 },
-        { path: "wExt", name: "TOU tariff", tag: "↑ 6%", dir: "up", phase: 0.78, speed: 0.000038 },
-        { path: "wTel", name: "Power draw", tag: "↑ 8%", dir: "up", phase: 0.4, speed: 0.00004 },
-        { path: "wApp", name: "Shift plan", tag: "↑ 2%", dir: "up", phase: 0.15, speed: 0.000039 },
-        { path: "wApp", name: "Demand forecast", tag: "↑ 5%", dir: "up", phase: 0.68, speed: 0.000036 },
+        { path: "wExt", name: "Feedstock", tag: "↑ 8%", dir: "up", phase: 0.28, speed: 0.000052 },
+        { path: "wTel", name: "Power draw", tag: "↑ 8%", dir: "up", phase: 0.48, speed: 0.000048 },
+        { path: "wApp", name: "Demand forecast", tag: "↑ 5%", dir: "up", phase: 0.32, speed: 0.00005 },
+        { path: "wExt", name: "TOU tariff", tag: "↑ 6%", dir: "up", phase: 0.82, speed: 0.000046 },
+        { path: "wApp", name: "Shift plan", tag: "↑ 2%", dir: "up", phase: 0.78, speed: 0.000044 },
       ];
 
       /* 9 recommendations — only 2 visible; carousel after open */
@@ -490,10 +498,10 @@
 
       const LAYOUT = {
         docks: [
-          /* Ext/App: inset left from plant edge + farther from middle */
-          { id: "wExt", label: "srcExt", dock: "dockExt", yFrac: 0.0, xInset: 110 },
-          { id: "wTel", label: "srcTel", dock: "dockTel", yFrac: 0.5, xInset: 0 },
-          { id: "wApp", label: "srcApp", dock: "dockApp", yFrac: 1.0, xInset: 110 },
+          /* Ext/App: into plant + vertically away from telemetry */
+          { id: "wExt", label: "srcExt", dock: "dockExt", yFrac: 0.1, xInset: 118 },
+          { id: "wTel", label: "srcTel", dock: "dockTel", yFrac: 0.5, xInset: 4 },
+          { id: "wApp", label: "srcApp", dock: "dockApp", yFrac: 0.9, xInset: 118 },
         ],
         logo: { x: 640, y: 340 },
       };
@@ -563,9 +571,9 @@
         const img = document.getElementById("plantImg");
         const box = img && img.getClientRects().length ? img.getBoundingClientRect() : pr;
         const gap = Math.max(0, lr.left - box.right);
-        const turnX = toSvg(box.right + Math.max(72, gap * 0.38), box.top).x;
-        const rad = 16;
-        const fan = 86;
+        /* Short horizontal, then long sharp diagonal (matches reference elbow) */
+        const turnX = toSvg(box.right + Math.max(52, gap * 0.2), box.top).x;
+        const fan = 78;
 
         LAYOUT.docks.forEach((dock, i) => {
           const inset = dock.xInset || 0;
@@ -574,21 +582,12 @@
           const targetY = hubY + (i - 1) * fan;
           const ox = origin.x;
           const oy = origin.y;
-          /* Ext/App start further left — give them a longer horizontal run */
-          const mx = Math.min(turnX + (inset > 0 ? inset * 0.35 : 0), hubX - rad * 2);
-          const sy = targetY >= oy ? 1 : -1;
+          const mx = Math.min(turnX + (inset > 0 ? 18 : 0), hubX - 48);
           let d;
           if (Math.abs(targetY - oy) < 3) {
             d = `M ${ox} ${oy} L ${hubX} ${oy}`;
           } else {
-            d = [
-              `M ${ox} ${oy}`,
-              `L ${mx - rad} ${oy}`,
-              `Q ${mx} ${oy} ${mx} ${oy + sy * rad}`,
-              `L ${mx} ${targetY - sy * rad}`,
-              `Q ${mx} ${targetY} ${mx + rad} ${targetY}`,
-              `L ${hubX} ${targetY}`,
-            ].join(" ");
+            d = `M ${ox} ${oy} L ${mx} ${oy} L ${hubX} ${targetY}`;
           }
           path.setAttribute("d", d);
 
