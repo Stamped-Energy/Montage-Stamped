@@ -23,9 +23,9 @@
       --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
       --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
       --font-label: "IBM Plex Mono", ui-monospace, monospace;
-      /* Frame 9 canvas */
-      --f9-w: 2529;
-      --f9-h: 1274;
+      /* Frame 10 canvas */
+      --f10-w: 2529;
+      --f10-h: 1274;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,7 +41,7 @@
 
     .stage {
       width: min(1280px, 98vw);
-      /* Match Frame 9 aspect so SVG meet has no letterbox offset */
+      /* Match Frame 10 aspect so SVG meet has no letterbox offset */
       aspect-ratio: 2529 / 1274;
       height: auto;
       max-height: 96vh;
@@ -56,7 +56,7 @@
       background: var(--bg);
     }
 
-    /* SVG uses Frame 9 viewBox so wire d values stay in Figma coords */
+    /* SVG uses Frame 10 viewBox so wire d values stay in Figma coords */
     .scene-svg {
       position: absolute;
       inset: 0;
@@ -79,13 +79,13 @@
       stroke-width: 2;
     }
 
-    /* Plant — Frame 9 slot ~0% / 12.5% / 37% / 81% */
+    /* Plant — Frame 10 slot ~0.8% / 18% / 36% / 66% */
     .plant {
       position: absolute;
-      left: 0;
-      top: 12.5%;
-      width: 37%;
-      height: 81%;
+      left: 0.75%;
+      top: 18.1%;
+      width: 36.3%;
+      height: 65.9%;
       z-index: 1;
       opacity: 0;
       overflow: visible;
@@ -242,11 +242,11 @@
       background: #4a2c28;
     }
 
-    /* Logo — Frame 9 ~59% / center, ~9% width */
+    /* Logo — Frame 10 center ~62.5%, ~10% width */
     .logo-wrap {
       position: absolute;
       z-index: 4;
-      left: 59.2%;
+      left: 62.5%;
       top: 50%;
       display: flex;
       flex-direction: column;
@@ -257,8 +257,8 @@
     }
 
     .logo-wrap img {
-      width: min(112px, 8.7vw);
-      height: min(112px, 8.7vw);
+      width: min(128px, 10vw);
+      height: min(128px, 10vw);
       display: block;
     }
 
@@ -273,7 +273,7 @@
       padding: 6px 12px;
     }
 
-    /* Recs — Frame 9 ~72% left, vertically with mark */
+    /* Recs — Frame 10 ~72% left, vertically with mark */
     .rx-panel {
       position: absolute;
       top: 50%;
@@ -399,16 +399,16 @@
     }
 
     @media (max-width: 1100px) {
-      .plant { width: 40%; }
-      .logo-wrap { left: 56%; }
-      .logo-wrap img { width: min(96px, 9vw); height: min(96px, 9vw); }
+      .plant { width: 38%; }
+      .logo-wrap { left: 60%; }
+      .logo-wrap img { width: min(112px, 10vw); height: min(112px, 10vw); }
       .rx-panel { left: 70%; width: min(280px, 28%); }
     }
 
     @media (max-width: 900px) {
-      .plant { width: 42%; top: 14%; height: 72%; }
-      .logo-wrap { left: 54%; }
-      .logo-wrap img { width: min(80px, 11vw); height: min(80px, 11vw); }
+      .plant { width: 40%; top: 16%; height: 62%; }
+      .logo-wrap { left: 58%; }
+      .logo-wrap img { width: min(96px, 12vw); height: min(96px, 12vw); }
       .rx-panel { left: 68%; width: min(240px, 30%); }
       .rx-copy { font-size: 12px; }
       :root { --rx-h: 72px; }
@@ -429,19 +429,19 @@
 <body>
   <div class="stage" id="stage">
     <div class="scene" id="scene">
-      <!-- Plant: Frame 9 asset (transparent) -->
+      <!-- Plant: Frame 10 asset (transparent) -->
       <div class="plant" id="plant">
         <div class="plant-fallback" id="plantFallback">Plant photo<br />placeholder</div>
         <img
           id="plantImg"
-          src="../assets/plant-placeholder.png?v=frame9"
+          src="../assets/plant-placeholder.png?v=frame10"
           alt=""
           onload="document.getElementById('plantFallback').style.display='none';"
           onerror="this.remove(); document.getElementById('plantFallback').style.display='grid';"
         />
       </div>
 
-      <!-- viewBox = Frame 9 (2529×1274); paths from Figma Vectors 11–13 + out connector -->
+      <!-- viewBox = Frame 10 (2529×1274); paths from Group 4 (Vectors 11–13) + live out connector -->
       <svg class="scene-svg" id="svg" viewBox="0 0 2529 1274" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <path class="wire" id="wExt" />
         <path class="wire" id="wTel" />
@@ -460,7 +460,7 @@
       <div class="signals" id="signals" aria-hidden="true"></div>
 
       <div class="logo-wrap" id="logoWrap">
-        <img src="../assets/logo-mark.png" width="118" height="118" alt="" />
+        <img src="../assets/figma-frame10/logo-frame10.png" width="128" height="128" alt="" />
         <div class="logo-caption">Stamped</div>
       </div>
 
@@ -484,18 +484,16 @@
       const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
       /*
-        Frame 9 wire paths — absolute coords in 2529×1274 space.
-        Source SVGs: brand/stamped/assets/figma-frame9/wire-*.svg
-        Vector 11 (ext) @ (684, 262.5)
-        Vector 12 (tel) @ (813.5, 658)
-        Vector 13 (app) @ (425.5, 731) — reversed so travel is plant → logo
-        Out connector: logo right → recs left (horizontal)
+        Frame 10 wire paths — absolute coords in 2529×1274 space.
+        Traced from Group 4 (Vectors 11–13) → brand/stamped/assets/figma-frame10/wire-*.svg
+        Offset origin (459.5, 263) = union of V11–V13 in Frame 10.
+        Out connector: live horizontal from logo mark right → recs left.
       */
-      const FRAME9_PATHS = {
-        wExt: "M 686 398.034 V 265.534 L 1452 594.034",
-        wTel: "M 814.611 739.5 L 933.611 660 H 1455.611",
-        wApp: "M 426.537 908.086 L 871.537 1178.086 L 1451.04 732.586",
-        wOut: "M 1712 651 L 1820 651",
+      const FRAME10_PATHS = {
+        wExt: "M 676.5 334 V 271 L 1447.5 592",
+        wTel: "M 892.5 690 L 935.5 662 H 1454.5",
+        wApp: "M 466.5 1000 L 782.5 1198 L 1451.5 725",
+        wOut: "M 1709 664 L 1820 664",
       };
 
       const CHIP_DEFS = [
@@ -583,11 +581,11 @@
           return pt.matrixTransform(inv);
         }
 
-        /* Inbound wires: fixed Frame 9 geometry */
-        Object.keys(FRAME9_PATHS).forEach((id) => {
+        /* Inbound wires: fixed Frame 10 geometry */
+        Object.keys(FRAME10_PATHS).forEach((id) => {
           if (id === "wOut") return;
           const path = document.getElementById(id);
-          if (path) path.setAttribute("d", FRAME9_PATHS[id]);
+          if (path) path.setAttribute("d", FRAME10_PATHS[id]);
         });
 
         /* Out connector: live from mark right edge → recs left (not caption box) */
