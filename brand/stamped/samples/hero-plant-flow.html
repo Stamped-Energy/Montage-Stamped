@@ -370,7 +370,7 @@
       letter-spacing: -0.01em;
       line-height: 1.35;
       color: var(--mute);
-      max-width: 28ch;
+      white-space: nowrap;
     }
 
     .rx-live {
@@ -513,7 +513,7 @@
       }
       .rx-panel { right: 1%; width: min(270px, 31%); }
       .rx-title { font-size: 15px; }
-      .rx-sub { font-size: 11px; max-width: 22ch; }
+      .rx-sub { font-size: 10px; }
       .rx-copy { font-size: 14px; }
       .chip-name { font-size: 12px; }
       .src-label { font-size: 11px; padding: 7px 12px; }
@@ -561,9 +561,9 @@
       <span class="dock-dot" id="dockTel" aria-hidden="true"></span>
       <span class="dock-dot" id="dockApp" aria-hidden="true"></span>
 
-      <div class="src-label" id="srcExt">External signals</div>
+      <div class="src-label" id="srcExt">Market data</div>
       <div class="src-label" id="srcTel">Plant telemetry</div>
-      <div class="src-label" id="srcApp">Application data</div>
+      <div class="src-label" id="srcApp">Application systems</div>
 
       <div class="signals" id="signals" aria-hidden="true"></div>
 
@@ -576,7 +576,7 @@
         <div class="rx-head">
           <div class="rx-head-text">
             <div class="rx-title">Prescriptions</div>
-            <p class="rx-sub">Ranked plant actions with ₹ impact for this shift</p>
+            <p class="rx-sub">Ranked plant actions with rupee impact</p>
           </div>
           <div class="rx-live" id="rxLive">Live</div>
         </div>
@@ -622,13 +622,13 @@
 
       const RX_ITEMS = [
         { money: "+ ₹2.4L", label: "Annual", copy: "Optimize Shift 2 planning before peak reset" },
-        { money: "+ ₹18,000", label: "Avoid scrap", copy: "Correct setpoint for feedstock drift" },
+        { money: "+ ₹48,000", label: "Avoid scrap", copy: "Correct setpoint for feedstock drift" },
         { money: "+ ₹95,000", label: "Demand", copy: "Stagger high-load assets to cut MD" },
         { money: "+ ₹42,000", label: "Idle waste", copy: "Shed idle HVAC during changeover" },
-        { money: "+ ₹31,000", label: "TOU", copy: "Pull forward batch into off-peak window" },
-        { money: "+ ₹8,500", label: "PF", copy: "Correct lagging bank on feeder 3" },
-        { money: "+ ₹1.2L", label: "Baseline", copy: "Retune dryer SEC after feedstock change" },
-        { money: "+ ₹6,200", label: "Leak", copy: "Inspect compressed-air branch on Line B" },
+        { money: "+ ₹38,000", label: "TOU", copy: "Pull forward batch into off-peak window" },
+        { money: "+ ₹12,000", label: "PF", copy: "Correct lagging bank on feeder 3" },
+        { money: "+ ₹1.8L", label: "Baseline", copy: "Retune dryer SEC after feedstock change" },
+        { money: "+ ₹11,000", label: "Leak", copy: "Inspect compressed-air branch on Line B" },
         { money: "+ ₹75,000", label: "Schedule", copy: "Avoid MD spike at shift overlap" },
       ];
 
