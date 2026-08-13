@@ -473,22 +473,6 @@
       max-width: 36ch;
     }
 
-    .footnote {
-      position: absolute;
-      left: 50%;
-      bottom: 10px;
-      transform: translateX(-50%);
-      z-index: 7;
-      font-family: var(--font-label);
-      font-size: 9px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--mute);
-      opacity: 0;
-      white-space: nowrap;
-    }
-
     @media (max-width: 1100px) {
       .plant { width: 38%; }
       .logo-wrap { left: 58%; }
@@ -522,7 +506,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .plant, .src-label, .dock-dot, .rx-panel, .rx-live, .logo-wrap, .footnote, .wire {
+      .plant, .src-label, .dock-dot, .rx-panel, .rx-live, .logo-wrap, .wire {
         opacity: 1 !important;
       }
       .logo-wrap { transform: translateX(-50%) !important; }
@@ -584,8 +568,6 @@
           <div class="rx-track" id="rxTrack"></div>
         </div>
       </aside>
-
-      <p class="footnote" id="footnote">Indicative example · not plant-verified</p>
     </div>
   </div>
 
@@ -609,7 +591,7 @@
       };
 
       /* Shared speed keeps same-path spacing stable; phases are staggered per wire */
-      const CHIP_SPEED = 0.00005;
+      const CHIP_SPEED = 0.000038;
       const CHIP_DEFS = [
         { path: "wExt", name: "Feedstock", tag: "↑ 8%", dir: "up", phase: 0.14, speed: CHIP_SPEED },
         { path: "wTel", name: "Power draw", tag: "↑ 8%", dir: "up", phase: 0.42, speed: CHIP_SPEED },
@@ -927,14 +909,13 @@
         const logo = document.getElementById("logoWrap");
         const panel = document.getElementById("rxPanel");
         const live = document.getElementById("rxLive");
-        const footnote = document.getElementById("footnote");
         const wExt = document.getElementById("wExt");
         const wTel = document.getElementById("wTel");
         const wApp = document.getElementById("wApp");
         const wOut = document.getElementById("wOut");
 
         if (reduce) {
-          [plant, logo, panel, live, footnote, ...srcs, ...docks].forEach((el) => {
+          [plant, logo, panel, live, ...srcs, ...docks].forEach((el) => {
             el.style.opacity = "1";
           });
           logo.style.transform = "translateX(-50%)";
@@ -978,7 +959,6 @@
         layoutPaths();
         await drawWire(wOut, 420, 0);
         await tween(live, { opacity: 1 }, 280, 40);
-        await tween(footnote, { opacity: 1 }, 360, 0);
 
         startCarousel();
       }
