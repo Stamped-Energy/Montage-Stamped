@@ -19,7 +19,7 @@ Agents: see **Active Brand** in repo-root [`AGENT_GUIDE.md`](../../AGENT_GUIDE.m
 5. Relevant file under [`prompts/`](prompts/)  
 6. [`context/sources/`](context/sources/) only when you need depth  
 
-Also skim [`BRAND_BRIDGE.md`](BRAND_BRIDGE.md) and [`references/cvector-audit.md`](references/cvector-audit.md).
+Also skim [`BRAND_BRIDGE.md`](BRAND_BRIDGE.md), [`references/cvector-audit.md`](references/cvector-audit.md), and [`references/homepage-animation-backlog.md`](references/homepage-animation-backlog.md) (site MotionSlot inventory).
 
 ---
 
@@ -60,7 +60,7 @@ Refresh `context/sources/` when Master or ICP major-bumps. Distillations may nee
 
 ```text
 context/           Stamped product + claims + sources
-references/        CVector audit (inspiration only)
+references/        CVector audit + homepage animation backlog
 DESIGN_VIDEO.md    Impeccable brand-register video DESIGN
 MOTION_LANGUAGE.md Motion physics + signature patterns
 BRAND_BRIDGE.md    Website ↔ video token map
