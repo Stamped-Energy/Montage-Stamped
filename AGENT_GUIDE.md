@@ -19,7 +19,12 @@ This checkout is brand-locked to **Stamped Energy**. For **any** production requ
 3. [`brand/stamped/DESIGN_VIDEO.md`](brand/stamped/DESIGN_VIDEO.md) + [`brand/stamped/MOTION_LANGUAGE.md`](brand/stamped/MOTION_LANGUAGE.md)  
 4. [`styles/stamped-industrial.yaml`](styles/stamped-industrial.yaml) (and/or [`brand/stamped/visual-styles/stamped-industrial.md`](brand/stamped/visual-styles/stamped-industrial.md))  
 5. Relevant starter under [`brand/stamped/prompts/`](brand/stamped/prompts/) when it matches the brief  
-6. Skim [`brand/stamped/BRAND_BRIDGE.md`](brand/stamped/BRAND_BRIDGE.md) + [`brand/stamped/references/cvector-audit.md`](brand/stamped/references/cvector-audit.md)
+6. Skim [`brand/stamped/BRAND_BRIDGE.md`](brand/stamped/BRAND_BRIDGE.md) + [`brand/stamped/references/cvector-audit.md`](brand/stamped/references/cvector-audit.md)  
+7. **Website / MotionSlot work (or “what still needs building on the site”):** read [`brand/stamped/references/homepage-animation-backlog.md`](brand/stamped/references/homepage-animation-backlog.md) — A00 hero is done; A01–A10 are the remaining homepage compositions
+
+### Open work — homepage animations (agents)
+
+If the user asks what site motion is left, to “go through this repo,” or to build homepage / MotionSlot animations, **start from** [`brand/stamped/references/homepage-animation-backlog.md`](brand/stamped/references/homepage-animation-backlog.md). That file is the inventory of compositions still to make (mapped to Main_Website slots + CVector inspiration). Do not invent a parallel backlog.
 
 ### Hard rules
 
@@ -27,7 +32,8 @@ This checkout is brand-locked to **Stamped Energy**. For **any** production requ
 - Do not invent alternate palettes, type stacks, or motion grammar for “freshness.” Font stack is Space Grotesk / Inter / IBM Plex Mono. Primary accent is Forge Coral `#F75440` on demo-deck `#f7faf5`.  
 - Claims must pass the voice/claims firewall (₹ evidence language; no EMS/MES/CMMS/PLC-replacement claims; no invented fleet metrics; no CVector marks/metrics).  
 - Log playbook selection in `decision_log` with category `playbook_selection`. If the user overrides the brand default, record why.  
-- Depth sources live in `brand/stamped/context/sources/` — open only when you need a quote, ICP table, or architecture detail.
+- Depth sources live in `brand/stamped/context/sources/` — open only when you need a quote, ICP table, or architecture detail.  
+- For Main_Website homepage MotionSlots, treat [`brand/stamped/references/homepage-animation-backlog.md`](brand/stamped/references/homepage-animation-backlog.md) as the work list (A01–A10 P0).
 
 ## First Interaction — Onboarding
 

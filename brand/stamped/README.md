@@ -19,7 +19,23 @@ Agents: see **Active Brand** in repo-root [`AGENT_GUIDE.md`](../../AGENT_GUIDE.m
 5. Relevant file under [`prompts/`](prompts/)  
 6. [`context/sources/`](context/sources/) only when you need depth  
 
-Also skim [`BRAND_BRIDGE.md`](BRAND_BRIDGE.md), [`references/cvector-audit.md`](references/cvector-audit.md), and [`references/homepage-animation-backlog.md`](references/homepage-animation-backlog.md) (site MotionSlot inventory).
+Also skim [`BRAND_BRIDGE.md`](BRAND_BRIDGE.md) and [`references/cvector-audit.md`](references/cvector-audit.md).
+
+---
+
+## Open work — homepage animations (read this)
+
+**Canonical inventory:** [`references/homepage-animation-backlog.md`](references/homepage-animation-backlog.md)
+
+Agents exploring this pack / repo for “what still needs to be made” for the Stamped marketing homepage should open that file first. It is the authority for remaining Main_Website `MotionSlot` compositions:
+
+| Status | IDs | What |
+|--------|-----|------|
+| Done | A00 | Hero plant-flow (`HeroPlantFlow`) |
+| Missing (P0) | A01–A10 | Problem ×3, What is, HIW visuals ×4, Solutions ×2 |
+| Optional (P1) | B01–B04 | Impact fade-in, CTA polish; no new slots |
+
+Build order and CVector mapping live in the backlog. Per-slot briefs use [`prompts/website-motion-brief.md`](prompts/website-motion-brief.md). Do not invent a second list.
 
 ---
 

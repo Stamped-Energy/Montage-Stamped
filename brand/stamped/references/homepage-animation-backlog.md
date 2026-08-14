@@ -2,6 +2,8 @@
 
 **Status:** Inventory only — no implementation in this doc.  
 **Date:** Aug 2026  
+**Agent discovery:** Linked from repo-root `AGENT_GUIDE.md` (Active Brand → open work), `brand/stamped/README.md`, `PROJECT_CONTEXT.md`, `MOTION_LANGUAGE.md`, and `prompts/website-motion-brief.md`. If an agent is asked what homepage motion still needs building, **open this file first**.  
+**Website-repo mirror:** Main_Website also keeps a copy at `docs/openmontage-brand/references/homepage-animation-backlog.md` — keep both in sync when editing.  
 **Authority for site slots:** Main_Website CVector-parity homepage (`app/page.tsx`), not the older live [stamped.work](https://stamped.work/) hero.  
 **Inspiration:** [https://www.cvector.com/](https://www.cvector.com/) — motion grammar only. See [`cvector-audit.md`](cvector-audit.md).  
 **Brief template:** [`../prompts/website-motion-brief.md`](../prompts/website-motion-brief.md)
